@@ -46,3 +46,22 @@ CREATE TABLE employees (
     created_by VARCHAR(255),
     created_by_id INT
 );
+
+
+INSERT INTO employee (
+    initial, gender, designation, name, first_name, last_name, degree, email, blood_group, marital_status, father_name, mother_name, city, current_address, permanent_address, education_details, experience_details, health_details, hobbies, description, is_active, is_trainee, joined_date, exit_date, mobile, contact_other, contact_mother, contact_father, image, created_by, created_by_id
+) VALUES 
+    ('Mr.', 'Male', 'Manager', 'John Doe', 'John', 'Doe', 'MBA', 'john.doe@example.com', 'O+', 'Single', 'David Doe', 'Mary Doe', 'New York', '123 Main St', '456 Elm St', 'Bachelor in Business Administration from XYZ University', '5 years as a manager at ABC Corp', 'Good health condition', 'Reading, hiking', NULL, true, false, '2024-02-29', NULL, '1234567890', NULL, '0987654321', '0987654321', 'image_url_here', 'Admin', 1),
+    ('Ms.', 'Female', 'Software Engineer', 'Jane Smith', 'Jane', 'Smith', 'BSc', 'jane.smith@example.com', 'A-', 'Married', 'Michael Smith', 'Sarah Smith', 'Los Angeles', '789 Oak St', '987 Pine St', 'Bachelor of Science in Computer Science from ABC University', '3 years as a software engineer at XYZ Corp', 'No major health issues', 'Playing guitar, swimming', NULL, true, false, '2023-12-15', NULL, '9876543210', NULL, '0123456789', '0123456789', 'image_url_here', 'Admin', 1),
+    ('Mr.', 'Male', 'HR Manager', 'Michael Johnson', 'Michael', 'Johnson', 'MA', 'michael.johnson@example.com', 'B+', 'Divorced', 'Robert Johnson', 'Emily Johnson', 'Chicago', '456 Maple St', '321 Oak St', 'Master of Arts in Human Resource Management from DEF University', '8 years as an HR manager at LMN Corp', 'Occasional back pain', 'Cooking, gardening', NULL, true, false, '2022-10-20', NULL, '4567890123', NULL, '9876543210', '9876543210', 'image_url_here', 'Admin', 1),
+    ('Mrs.', 'Female', 'Marketing Specialist', 'Emily Brown', 'Emily', 'Brown', 'BBA', 'emily.brown@example.com', 'AB-', 'Married', 'James Brown', 'Olivia Brown', 'San Francisco', '789 Cedar St', '654 Walnut St', 'Bachelor of Business Administration in Marketing from GHI University', '4 years as a marketing specialist at OPQ Corp', 'Allergy to pollen', 'Painting, yoga', NULL, true, false, '2023-05-10', NULL, '7890123456', NULL, '6543210987', '6543210987', 'image_url_here', 'Admin', 1),
+    ('Mr.', 'Male', 'Accountant', 'Daniel Wilson', 'Daniel', 'Wilson', 'BCom', 'daniel.wilson@example.com', 'A+', 'Single', 'Richard Wilson', 'Sophia Wilson', 'Houston', '123 Elm St', '876 Oak St', 'Bachelor of Commerce in Accounting from JKL University', '2 years as an accountant at RST Corp', 'No health issues', 'Playing football, watching movies', NULL, true, false, '2024-01-05', NULL, '9012345678', NULL, '5432109876', '5432109876', 'image_url_here', 'Admin', 1);
+
+INSERT INTO employee_auth (
+    employee_id, username, password
+) VALUES 
+    (1, 'johndoe', 'hashed_password_here'),
+    (2, 'janesmith', 'hashed_password_here'),
+    (3, 'michaeljohnson', 'hashed_password_here'),
+    (4, 'emilybrown', 'hashed_password_here'),
+    (5, 'danielwilson', 'hashed_password_here');
