@@ -65,3 +65,13 @@ INSERT INTO employee_auth (
     (3, 'michaeljohnson', 'hashed_password_here'),
     (4, 'emilybrown', 'hashed_password_here'),
     (5, 'danielwilson', 'hashed_password_here');
+
+
+
+SELECT r.title AS role, p.title AS privilege
+FROM employee e
+INNER JOIN employee_role er ON e.id = er.employee_id
+INNER JOIN role r ON er.role_id = r.id
+INNER JOIN role_privilege rp ON r.id = rp.role_id
+INNER JOIN privilege p ON rp.privilege_id = p.id
+WHERE e.username = 'employee_name';
