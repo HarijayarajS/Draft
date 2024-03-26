@@ -61,3 +61,25 @@ SELECT
                 AND created_on <= $3 
             GROUP BY 
                 DATE(created_on)",
+
+
+
+
+
+SELECT 
+    DATE(esl.created_on) AS created_date,
+    SUBSTRING(esl.created_on::TEXT, 12, 8) AS in_time,
+    SUBSTRING(esl.modified_on::TEXT, 12, 8) AS out_time,
+    CAST(SUM(CASE WHEN esl.status = 'break-in' THEN esl.time_taken ELSE 0 END) AS BIGINT) AS break_time, 
+    CAST(SUM(CASE WHEN esl.status = 'lunch-in' THEN esl.time_taken ELSE 0 END) AS BIGINT) AS lunch_time 
+FROM 
+    employee_status_log esl
+JOIN
+    employees e ON esl.employee_id = e.id
+WHERE 
+    e.username = 'your_username'
+    AND esl.created_on >= $1 
+    AND esl.created_on <= $2 
+GROUP BY 
+    DATE(esl.created_on),
+    in_time;
