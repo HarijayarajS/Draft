@@ -45,3 +45,19 @@ VALUES
 ('2024-04-02 11:00:00+00', '2024-04-02 11:00:00+00', 1001, 'lunch-in', 0, false),
 ('2024-04-02 11:45:00+00', '2024-04-02 11:45:00+00', 1002, 'day-out', 0, false),
 ('2024-04-03 09:15:00+00', '2024-04-03 09:15:00+00', 1001, 'break-in', 3600, false);
+
+
+SELECT 
+                DATE(created_on) AS created_date,
+                SUBSTRING(created_on::TEXT, 12, 8) AS in_time,
+                SUBSTRING(modified_on::TEXT, 12, 8) AS out_time,
+                CAST(SUM(CASE WHEN status = 'break-in' THEN time_taken ELSE 0 END) AS BIGINT) AS break_time, 
+                CAST(SUM(CASE WHEN status = 'lunch-in' THEN time_taken ELSE 0 END) AS BIGINT) AS lunch_time 
+            FROM 
+                employee_status_log 
+            WHERE 
+                employee_id = $1 
+                AND created_on >= $2 
+                AND created_on <= $3 
+            GROUP BY 
+                DATE(created_on)",
