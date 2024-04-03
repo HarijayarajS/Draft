@@ -83,3 +83,19 @@ WHERE
 GROUP BY 
     DATE(esl.created_on),
     in_time;
+
+
+INSERT INTO holiday (date, title) 
+VALUES 
+    ('2024-01-26', 'Republic Day'),
+    ('2024-03-21', 'Holi'),
+    ('2024-04-06', 'Mahavir Jayanti'),
+    ('2024-04-14', 'Good Friday'),
+    ('2024-05-01', 'May Day'),
+    ('2024-06-05', 'Eid al-Fitr'),
+    ('2024-08-12', 'Eid al-Adha'),
+    ('2024-08-15', 'Independence Day'),
+    ('2024-10-02', 'Gandhi Jayanti'),
+    ('2024-10-25', 'Dussehra'),
+    ('2024-11-12', 'Diwali'),
+    ('2024-12-25', 'Christmas Day');
