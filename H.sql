@@ -75,3 +75,18 @@ INNER JOIN role r ON er.role_id = r.id
 INNER JOIN role_privilege rp ON r.id = rp.role_id
 INNER JOIN privilege p ON rp.privilege_id = p.id
 WHERE e.username = 'employee_name';
+
+
+
+INSERT INTO staff (name, mobile, gender, father_name, mother_name, address, description, is_active) 
+VALUES 
+('Mark Johnson', '123-456-7890', 'M', 'Michael Johnson', 'Sarah Johnson', '123 Main St, Anytown, USA', 'Senior Engineer', true),
+('Emily Anderson', '987-654-3210', 'F', 'Robert Anderson', 'Emily Anderson', '456 Elm St, Othertown, USA', 'Marketing Manager', true),
+('Peter Williams', '555-123-4567', 'M', 'James Williams', 'Jennifer Williams', '789 Oak St, Anycity, USA', 'HR Coordinator', true),
+('Anna Thompson', '111-222-3333', 'F', 'William Thompson', 'Mary Thompson', '101 Pine St, Somewhere, USA', 'Software Developer', true),
+('Thomas Clark', '777-888-9999', 'M', 'Thomas Clark', 'Patricia Clark', '202 Maple St, Anyville, USA', 'Project Manager', true),
+('Olivia Lee', '444-555-6666', 'F', 'Daniel Lee', 'Linda Lee', '303 Walnut St, Anothercity, USA', 'Graphic Designer', true),
+('Henry Rodriguez', '999-888-7777', 'M', 'Richard Rodriguez', 'Susan Rodriguez', '404 Oak St, Anytown, USA', 'Accountant', true),
+('Sophia Garcia', '222-333-4444', 'F', 'John Garcia', 'Karen Garcia', '505 Cedar St, Anycity, USA', 'Sales Representative', true),
+('Ethan Martinez', '666-777-8888', 'M', 'Jose Martinez', 'Maria Martinez', '606 Pine St, Anycity, USA', 'Customer Service Specialist', true),
+('Isabella Davis', '333-222-1111', 'F', 'David Davis', 'Laura Davis', '707 Elm St, Somewhere, USA', 'Operations Manager', true);
