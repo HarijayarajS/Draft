@@ -90,3 +90,30 @@ VALUES
 ('Sophia Garcia', '222-333-4444', 'F', 'John Garcia', 'Karen Garcia', '505 Cedar St, Anycity, USA', 'Sales Representative', true),
 ('Ethan Martinez', '666-777-8888', 'M', 'Jose Martinez', 'Maria Martinez', '606 Pine St, Anycity, USA', 'Customer Service Specialist', true),
 ('Isabella Davis', '333-222-1111', 'F', 'David Davis', 'Laura Davis', '707 Elm St, Somewhere, USA', 'Operations Manager', true);
+
+
+-- Inserting data into ticket table
+INSERT INTO ticket (title, description, status, day_on, resolution) VALUES 
+('Software Bug', 'Application crashes on startup', 'Open', '2024-04-15', NULL),
+('Network Issue', 'Unable to connect to the server', 'Open', '2024-04-14', NULL),
+('Login Problem', 'Users cannot log in to the system', 'Open', '2024-04-13', NULL),
+('Database Error', 'SQL error when querying data', 'Closed', '2024-04-12', 'Fixed the SQL query'),
+('UI Glitch', 'Button not displaying correctly', 'Open', '2024-04-11', NULL),
+('Performance Issue', 'System response time is slow', 'Open', '2024-04-10', NULL),
+('Email Notification', 'Emails are not being sent', 'Open', '2024-04-09', NULL),
+('Security Concern', 'Possible data breach detected', 'Open', '2024-04-08', NULL),
+('Feature Request', 'New feature for customer feedback', 'Open', '2024-04-07', NULL),
+('Server Maintenance', 'Scheduled server downtime', 'Closed', '2024-04-06', 'Completed server maintenance');
+
+-- Inserting data into ticket_comment table
+INSERT INTO ticket_comment (ticket_id, created_by_id, created_by, content) VALUES
+(1, 101, 'JohnDoe', 'Investigating the issue'),
+(2, 102, 'JaneDoe', 'Checking network configurations'),
+(3, 103, 'AliceSmith', 'Resetting user passwords'),
+(4, 104, 'BobJohnson', 'Optimized SQL query for performance'),
+(5, 105, 'CharlieBrown', 'Fixing CSS for the button display'),
+(6, 106, 'DavidWilson', 'Monitoring system resources'),
+(7, 107, 'EvaGreen', 'Reviewing email server logs'),
+(8, 108, 'FrankTaylor', 'Initiating security audit'),
+(9, 109, 'GraceClark', 'Gathering user feedback for the feature'),
+(10, 110, 'HelenWhite', 'Completed server maintenance successfully');
