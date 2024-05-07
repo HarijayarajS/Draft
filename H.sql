@@ -78,6 +78,8 @@ WHERE e.username = 'employee_name';
 
 
 
+
+
 INSERT INTO staff (name, mobile, gender, father_name, mother_name, address, description, is_active) 
 VALUES 
 ('Mark Johnson', '123-456-7890', 'M', 'Michael Johnson', 'Sarah Johnson', '123 Main St, Anytown, USA', 'Senior Engineer', true),
@@ -117,3 +119,36 @@ INSERT INTO ticket_comment (ticket_id, created_by_id, created_by, content) VALUE
 (8, 108, 'FrankTaylor', 'Initiating security audit'),
 (9, 109, 'GraceClark', 'Gathering user feedback for the feature'),
 (10, 110, 'HelenWhite', 'Completed server maintenance successfully');
+
+
+-- Inserting data into the project table
+INSERT INTO project (title, slug, code, type, description, is_archive)
+VALUES ('Project 1', 'project-1', 'P001', 'Research', 'Description of Project 1', false);
+
+INSERT INTO project (title, slug, code, type, description, is_archive)
+VALUES ('Project 2', 'project-2', 'P002', 'Development', 'Description of Project 2', false);
+
+INSERT INTO project (title, slug, code, type, description, is_archive)
+VALUES ('Project 3', 'project-3', 'P003', 'Design', 'Description of Project 3', false);
+
+-- Inserting data into the project_member table
+INSERT INTO project_member (project_id, employee_id, role)
+VALUES (1, 1, 'Project Manager');
+
+INSERT INTO project_member (project_id, employee_id, role)
+VALUES (1, 2, 'Developer');
+
+INSERT INTO project_member (project_id, employee_id, role)
+VALUES (2, 3, 'Designer');
+
+INSERT INTO project_member (project_id, employee_id, role)
+VALUES (2, 1, 'Project Manager');
+
+INSERT INTO project_member (project_id, employee_id, role)
+VALUES (3, 2, 'Developer');
+
+INSERT INTO project_member (project_id, employee_id, role)
+VALUES (3, 3, 'Designer');
+
+INSERT INTO project_member (project_id, employee_id, role)
+VALUES (3, 1, 'Project Manager');
