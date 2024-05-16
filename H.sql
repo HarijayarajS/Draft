@@ -152,3 +152,17 @@ VALUES (3, 3, 'Designer');
 
 INSERT INTO project_member (project_id, employee_id, role)
 VALUES (3, 1, 'Project Manager');
+
+
+INSERT INTO team_link (team_id, title, tags, link)
+VALUES
+    (1, 'Team A Homepage', '#homepage#teamA', 'http://example.com/team-a'),
+    (2, 'Team B Homepage', '#homepage#teamB', 'http://example.com/team-b'),
+    (3, 'Team C Homepage', '#homepage#teamC', 'http://example.com/team-c'),
+    (4, 'Team D Homepage', '#homepage#teamD', 'http://example.com/team-d'),
+    (5, 'Team E Homepage', '#homepage#teamE', 'http://example.com/team-e'),
+    (6, 'Team F Homepage', '#homepage#teamF', 'http://example.com/team-f'),
+    (7, 'Team G Homepage', '#homepage#teamG', 'http://example.com/team-g'),
+    (8, 'Team H Homepage', '#homepage#teamH', 'http://example.com/team-h'),
+    (9, 'Team I Homepage', '#homepage#teamI', 'http://example.com/team-i'),
+    (10, 'Team J Homepage', '#homepage#teamJ', 'http://example.com/team-j');
