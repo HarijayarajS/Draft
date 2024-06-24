@@ -1,4 +1,4 @@
-INSERT INTO customer (name, mobile, email, company, address, description, tags, is_archive)
+CRINSERT INTO customer (name, mobile, email, company, address, description, tags, is_archive)
 VALUES 
     ('John Doe', '1234567890', 'john.doe@example.com', 'ABC Company', '123 Main St, City A, Country X', 'Regular customer', 'regular, important', false),
     ('Jane Smith', '9876543210', 'jane.smith@example.com', 'XYZ Corporation', '456 Elm St, City B, Country Y', 'VIP customer', 'VIP, important', false),
@@ -166,3 +166,39 @@ VALUES
     (8, 'Team H Homepage', '#homepage#teamH', 'http://example.com/team-h'),
     (9, 'Team I Homepage', '#homepage#teamI', 'http://example.com/team-i'),
     (10, 'Team J Homepage', '#homepage#teamJ', 'http://example.com/team-j');
+
+use std::net::SocketAddr;
+
+use axum::{routing::get, Json};
+use utoipa::OpenApi;
+
+#[derive(OpenApi)]
+#[openapi(paths(openapi))]
+struct ApiDoc;
+
+/// Return JSON version of an OpenAPI schema
+#[utoipa::path(
+    get,
+    path = "/api-docs/openapi.json",
+    responses(
+        (status = 200, description = "JSON file", body = ())
+    )
+)]
+async fn openapi() -> Json<utoipa::openapi::OpenApi> {
+    Json(ApiDoc::openapi())
+}
+
+#[tokio::main]
+async fn main() {
+    let socket_address: SocketAddr = "127.0.0.1:8080".parse().unwrap();
+    let listener = tokio::net::TcpListener::bind(socket_address).await.unwrap();
+
+    let app = axum::Router::new().route("/api-docs/openapi.json", get(openapi));
+
+    axum::serve(listener, app.into_make_service())
+        .await
+        .unwrap()
+}
+
+
+
