@@ -201,4 +201,48 @@ async fn main() {
 }
 
 
+use aes_gcm::{
+    aead::{Aad, NewAead, SealingKey},
+    Aes256Gcm, KeySize, Nonce,
+};
+use rand::rngs::OsRng;
 
+// Function to encrypt data
+fn encrypt(data: &[u8], password: &str) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+    let password_bytes = password.as_bytes();
+    let key = KeySize::Key256.into(password_bytes);
+    let cipher = Aes256Gcm::new(key)?;
+    let nonce = Nonce::generate(&mut OsRng);
+
+    let encrypted_data = cipher.seal(nonce.clone(), Aad::none(), data)?;
+
+    Ok(vec![nonce.as_bytes().to_vec(), encrypted_data])
+}
+
+// Function to decrypt data
+fn decrypt(ciphertext: Vec<u8>, password: &str) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+    let password_bytes = password.as_bytes();
+    let key = KeySize::Key256.into(password_bytes);
+    let cipher = Aes256Gcm::new(key)?;
+    let (nonce, encrypted_data) = ciphertext.split_at(12).map(|slice| slice.to_vec());
+
+    let decrypted_data = cipher.open(nonce, Aad::none(), encrypted_data)?;
+
+    Ok(decrypted_data)
+}
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let data = b"Hello, World!";
+    let password = "mysecretpassword";
+
+    // Encrypting data
+    let encrypted = encrypt(data, password)?;
+    println!("Encrypted data: {:?}", encrypted);
+
+    // Decrypting data
+    let decrypted = decrypt(encrypted, password)?;
+    println!("Decrypted data: {:?}", String::from_utf8_lossy(&decrypted));
+
+    Ok(())
+}
+        
