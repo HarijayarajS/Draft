@@ -245,4 +245,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     Ok(())
 }
-        
+
+
+
+
+
+
+        INSERT INTO Workspaces (title, description) VALUES
+('Project Management', 'Task tracking, Team collaboration, Timeline and milestones'),
+('Customer Relationship Management (CRM)', 'Contact management, Sales pipeline tracking, Email and call logs'),
+('Inventory Management', 'Product catalog, Stock levels, Supplier information'),
+('Event Planning', 'Event schedules, Attendee lists, Budget management'),
+('Human Resources', 'Employee database, Leave and attendance tracking, Performance reviews'),
+('Content Management System (CMS)', 'Blog post scheduling, Content drafts and approvals, Media library'),
+('Finance and Accounting', 'Expense tracking, Invoice generation, Budgeting'),
+('Help Desk and Support', 'Ticketing system, Knowledge base, Customer feedback'),
+('Education and E-learning', 'Course management, Student progress tracking, Assignment submissions'),
+('E-commerce Management', 'Order tracking, Customer database, Product listings');
