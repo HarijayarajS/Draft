@@ -262,3 +262,46 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 ('Help Desk and Support', 'Ticketing system, Knowledge base, Customer feedback'),
 ('Education and E-learning', 'Course management, Student progress tracking, Assignment submissions'),
 ('E-commerce Management', 'Order tracking, Customer database, Product listings');
+
+
+        -- Insert sample surveys
+INSERT INTO survey (title, created_by, published_on, no_attended, no_total, status)
+VALUES 
+    ('Employee Engagement Survey', 'manager1', '2024-08-01', 50, 100, 'Published'),
+    ('Health & Wellness Survey', 'hr_admin', '2024-08-05', 20, 50, 'Published'),
+    ('Remote Work Feedback', 'manager2', '2024-08-10', 75, 80, 'Published'),
+    ('Team Satisfaction Survey', 'manager3', '2024-08-15', 40, 50, 'Published'),
+    ('Company Culture Survey', 'hr_admin', '2024-08-20', 10, 150, 'Draft'),
+    ('Training Effectiveness', 'trainer1', '2024-08-22', 60, 80, 'Published'),
+    ('Leadership Feedback Survey', 'leader1', '2024-08-24', 30, 50, 'Published'),
+    ('Productivity Check', 'manager4', '2024-08-26', 45, 75, 'Published'),
+    ('Client Interaction Survey', 'sales_lead', '2024-08-28', 35, 60, 'Published'),
+    ('Work-Life Balance Survey', 'hr_admin', '2024-08-30', 25, 100, 'Draft');
+
+-- Insert sample survey options
+INSERT INTO survey_option (survey_id, answer, no_votes)
+VALUES 
+    (1, 'Strongly Agree', 20),
+    (1, 'Agree', 30),
+    (2, 'Yes', 15),
+    (2, 'No', 5),
+    (3, 'Remote', 50),
+    (3, 'Hybrid', 25),
+    (4, 'Very Satisfied', 25),
+    (4, 'Satisfied', 15),
+    (5, 'Yes', 7),
+    (5, 'No', 3);
+
+-- Insert sample survey_employee responses
+INSERT INTO survey_employee (survey_id, employee_id, option_id)
+VALUES 
+    (1, 101, 1),
+    (1, 102, 2),
+    (2, 103, 3),
+    (2, 104, 4),
+    (3, 105, 5),
+    (3, 106, 6),
+    (4, 107, 7),
+    (4, 108, 8),
+    (5, 109, 9),
+    (5, 110, 10);
