@@ -303,5 +303,49 @@ VALUES
     (3, 106, 6),
     (4, 107, 7),
     (4, 108, 8),
+
+
+        -- Insert sample surveys with content and notes
+INSERT INTO survey (title, created_by, published_on, no_attended, no_total, status, content, notes)
+VALUES 
+    ('Employee Engagement Survey', 'manager1', '2024-08-01', 50, 100, 'Published', 
+    'This survey is designed to gauge employee engagement and satisfaction levels within the company.', 
+    'Consider expanding the scope of this survey to include remote employees next year.'),
+    
+    ('Health & Wellness Survey', 'hr_admin', '2024-08-05', 20, 50, 'Published', 
+    'A survey aimed at understanding employee health and wellness priorities, including fitness and mental health.', 
+    'The survey should be re-run every quarter to monitor trends in employee wellness.'),
+    
+    ('Remote Work Feedback', 'manager2', '2024-08-10', 75, 80, 'Published', 
+    'This survey collects feedback on the remote work experience, including productivity and work-life balance.', 
+    'Follow-up with a deeper dive into specific pain points mentioned in the responses.'),
+    
+    ('Team Satisfaction Survey', 'manager3', '2024-08-15', 40, 50, 'Published', 
+    'An internal survey to assess satisfaction within individual teams, focusing on collaboration and leadership.', 
+    'Run this survey again after major team restructuring.'),
+    
+    ('Company Culture Survey', 'hr_admin', '2024-08-20', 10, 150, 'Draft', 
+    'A draft survey for understanding employee perceptions of the company culture, values, and alignment.', 
+    'Refine the survey questions before publication to include leadership communication.'),
+    
+    ('Training Effectiveness', 'trainer1', '2024-08-22', 60, 80, 'Published', 
+    'A survey to evaluate the effectiveness of recent training programs and identify areas for improvement.', 
+    'Ensure that future surveys focus on feedback from participants with lower scores.'),
+    
+    ('Leadership Feedback Survey', 'leader1', '2024-08-24', 30, 50, 'Published', 
+    'This survey collects anonymous feedback on leadership and management styles within the company.', 
+    'Consider breaking down results by department for a more granular view.'),
+    
+    ('Productivity Check', 'manager4', '2024-08-26', 45, 75, 'Published', 
+    'A survey designed to measure employee productivity and efficiency under current work conditions.', 
+    'Use this survey to guide future decisions on workload management.'),
+    
+    ('Client Interaction Survey', 'sales_lead', '2024-08-28', 35, 60, 'Published', 
+    'A survey to evaluate employee-client interactions, including communication and relationship-building skills.', 
+    'Share results with the client relations team for actionable insights.'),
+    
+    ('Work-Life Balance Survey', 'hr_admin', '2024-08-30', 25, 100, 'Draft', 
+    'This survey assesses how employees are balancing their work and personal lives.', 
+    'Consider adding questions about support systems offered by the company.');
     (5, 109, 9),
     (5, 110, 10);
