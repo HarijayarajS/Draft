@@ -349,3 +349,20 @@ VALUES
     'Consider adding questions about support systems offered by the company.');
     (5, 109, 9),
     (5, 110, 10);
+
+
+
+
+
+        INSERT INTO job (ident, title, keywords, description, summary, content, category, type, is_remote, expiry_on) 
+VALUES
+  (1, 'Software Engineer', 'developer, code, engineer', 'Develop and maintain software systems.', 'Software development role.', 'Responsible for building and maintaining software.', 'Tech', 'Full-Time', true, '2024-12-31'),
+  (2, 'Data Analyst', 'data, analysis, reporting', 'Interpret data to support decision-making.', 'Data analysis and reporting.', 'Analyze datasets and generate reports.', 'Data', 'Full-Time', true, '2024-11-30'),
+  (3, 'Marketing Specialist', 'marketing, campaigns, strategy', 'Execute marketing strategies and campaigns.', 'Marketing campaign management.', 'Create and run marketing strategies.', 'Marketing', 'Full-Time', false, '2024-10-31'),
+  (4, 'UX Designer', 'UX, design, interface', 'Design intuitive user interfaces.', 'User experience design.', 'Create user-friendly designs.', 'Design', 'Full-Time', true, '2025-01-15'),
+  (5, 'Sales Executive', 'sales, targets, customers', 'Achieve sales targets by engaging clients.', 'Client engagement and sales.', 'Generate leads and close sales deals.', 'Sales', 'Full-Time', false, '2024-11-15'),
+  (6, 'HR Coordinator', 'HR, recruitment, employee', 'Coordinate recruitment and employee services.', 'Human resources coordination.', 'Manage recruitment processes and employee support.', 'HR', 'Part-Time', false, '2024-10-31'),
+  (7, 'Backend Developer', 'backend, server, API', 'Develop and maintain server-side logic.', 'Backend systems development.', 'Build APIs and backend services.', 'Tech', 'Full-Time', true, '2024-12-31'),
+  (8, 'Frontend Developer', 'frontend, UI, developer', 'Develop user interfaces for web applications.', 'Front-end web development.', 'Create interactive user interfaces.', 'Tech', 'Full-Time', true, '2024-12-31'),
+  (9, 'Project Manager', 'management, projects, delivery', 'Manage projects and ensure timely delivery.', 'Project management.', 'Lead project teams and ensure successful delivery.', 'Management', 'Full-Time', true, '2024-12-31'),
+  (10, 'DevOps Engineer', 'DevOps, infrastructure, pipelines', 'Manage infrastructure and automate pipelines.', 'Infrastructure automation.', 'Develop and maintain CI/CD pipelines and infrastructure.', 'Tech', 'Full-Time', true, '2024-12-31');
