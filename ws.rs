@@ -249,3 +249,84 @@ async fn send_task_list(socket: &mut WebSocket, task_list: &TaskList) -> Result<
     let json = serde_json::to_string(&tasks).unwrap();
     socket.send(Message::Text(json)).await
 }
+
+
+
+use futures_util::{stream::StreamExt, SinkExt};
+use serde::{Deserialize, Serialize};
+use tokio::sync::mpsc;
+use tokio_tungstenite::{connect_async, tungstenite::protocol::Message};
+use uuid::Uuid;
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Task {
+    pub id: Uuid,
+    pub title: String,
+}
+
+pub struct TaskManager {
+    sender: mpsc::Sender<String>,
+}
+
+impl TaskManager {
+    /// Connects to the WebSocket server and initializes the TaskManager
+    pub async fn new(server_url: &str) -> Self {
+        let (ws_stream, _) = connect_async(server_url)
+            .await
+            .expect("Failed to connect to WebSocket server");
+
+        let (mut write, mut read) = ws_stream.split();
+
+        // Channel to send commands to the WebSocket
+        let (tx, mut rx) = mpsc::channel::<String>(10);
+
+        // Spawn a task to send messages
+        tokio::spawn(async move {
+            while let Some(command) = rx.recv().await {
+                if let Err(e) = write.send(Message::Text(command)).await {
+                    eprintln!("Failed to send message: {}", e);
+                }
+            }
+        });
+
+        // Spawn a task to handle incoming messages
+        tokio::spawn(async move {
+            while let Some(Ok(msg)) = read.next().await {
+                if let Message::Text(text) = msg {
+                    println!("Received message: {}", text);
+                }
+            }
+        });
+
+        TaskManager { sender: tx }
+    }
+
+    /// Creates a task with the given title
+    pub async fn create_task(&self, title: &str) {
+        let command = format!("create:{}", title);
+        self.sender
+            .send(command)
+            .await
+            .expect("Failed to send create task command");
+    }
+
+    /// Deletes a task with the given UUID
+    pub async fn delete_task(&self, task_id: Uuid) {
+        let command = format!("delete:{}", task_id);
+        self.sender
+            .send(command)
+            .await
+            .expect("Failed to send delete task command");
+    }
+}
+
+#[tokio::main]
+async fn main() {
+    let task_manager = TaskManager::new("ws://127.0.0.1:3000/ws").await;
+
+    // Example usage
+    task_manager.create_task("Buy groceries").await;
+
+    let task_id = Uuid::new_v4(); // Replace with a valid task ID to test deletion
+    task_manager.delete_task(task_id).await;
+}
