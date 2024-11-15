@@ -330,3 +330,119 @@ async fn main() {
     let task_id = Uuid::new_v4(); // Replace with a valid task ID to test deletion
     task_manager.delete_task(task_id).await;
 }
+
+
+
+use axum::{
+    extract::ws::{Message, WebSocket, WebSocketUpgrade},
+    extract::Extension,
+    response::IntoResponse,
+    routing::get,
+    Router,
+};
+use futures_util::{sink::SinkExt, stream::StreamExt};
+use serde::{Deserialize, Serialize};
+use std::sync::{Arc, Mutex};
+use tokio::sync::broadcast;
+use uuid::Uuid;
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+struct Task {
+    id: Uuid,
+    title: String,
+}
+
+type TaskList = Arc<Mutex<Vec<Task>>>;
+
+#[tokio::main]
+async fn main() {
+    // Create shared state
+    let task_list: TaskList = Arc::new(Mutex::new(Vec::new()));
+    let (tx, _rx) = broadcast::channel(10);
+
+    // Build the app with the `Extension` middleware
+    let app = Router::new()
+        .route("/ws", get(ws_handler))
+        .layer(Extension(task_list))
+        .layer(Extension(tx));
+
+    axum::Server::bind(&"127.0.0.1:3000".parse().unwrap())
+        .serve(app.into_make_service())
+        .await
+        .unwrap();
+}
+
+/// Handles the WebSocket upgrade and passes the socket to the task message handler
+async fn ws_handler(
+    ws: WebSocketUpgrade,
+    Extension(task_list): Extension<TaskList>,
+    Extension(tx): Extension<broadcast::Sender<Task>>,
+) -> impl IntoResponse {
+    ws.on_upgrade(move |socket| handle_socket(socket, task_list, tx))
+}
+
+/// Handles incoming WebSocket messages and responds with task data
+async fn handle_socket(mut socket: WebSocket, task_list: TaskList, tx: broadcast::Sender<Task>) {
+    while let Some(Ok(Message::Text(text))) = socket.next().await {
+        if text.starts_with("create:") {
+            let title = text["create:".len()..].trim().to_string();
+            let new_task = create_task(title);
+
+            add_task_to_list(new_task.clone(), &task_list);
+            broadcast_task(new_task.clone(), &tx);
+
+            if let Err(e) = send_task_list(&mut socket, &task_list).await {
+                eprintln!("Failed to send task list: {}", e);
+                break;
+            }
+        } else if text.starts_with("delete:") {
+            let id_str = text["delete:".len()..].trim();
+            if let Ok(id) = Uuid::parse_str(id_str) {
+                if delete_task(id, &task_list) {
+                    broadcast_task_list(&tx, &task_list);
+                    if let Err(e) = send_task_list(&mut socket, &task_list).await {
+                        eprintln!("Failed to send task list: {}", e);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Creates a new task with a unique ID
+fn create_task(title: String) -> Task {
+    Task {
+        id: Uuid::new_v4(),
+        title,
+    }
+}
+
+/// Adds the new task to the shared task list
+fn add_task_to_list(new_task: Task, task_list: &TaskList) {
+    let mut tasks = task_list.lock().unwrap();
+    tasks.push(new_task);
+}
+
+/// Deletes a task by ID from the shared task list
+fn delete_task(task_id: Uuid, task_list: &TaskList) -> bool {
+    let mut tasks = task_list.lock().unwrap();
+    let len_before = tasks.len();
+    tasks.retain(|task| task.id != task_id);
+    len_before != tasks.len()  // Returns true if a task was deleted
+}
+
+/// Broadcasts the updated task list to all clients
+fn broadcast_task_list(tx: &broadcast::Sender<Task>, task_list: &TaskList) {
+    let tasks = task_list.lock().unwrap().clone();
+    for task in tasks {
+        let _ = tx.send(task.clone());
+    }
+}
+
+/// Sends the updated list of tasks to the WebSocket client
+async fn send_task_list(socket: &mut WebSocket, task_list: &TaskList) -> Result<(), axum::Error> {
+    let tasks = task_list.lock().unwrap().clone();
+    let json = serde_json::to_string(&tasks).unwrap();
+    socket.send(Message::Text(json)).await
+}
