@@ -162,3 +162,90 @@ async fn handle_socket(
         socket.send(Message::Text(json)).await.unwrap();
     }
 }
+
+
+
+use axum::{
+    extract::ws::{Message, WebSocket, WebSocketUpgrade},
+    extract::Extension,
+    response::IntoResponse,
+    routing::get,
+    Router,
+};
+use futures_util::{sink::SinkExt, stream::StreamExt};
+use serde::{Deserialize, Serialize};
+use std::sync::{Arc, Mutex};
+use tokio::sync::broadcast;
+use uuid::Uuid;
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+struct Task {
+    id: Uuid,
+    title: String,
+}
+
+type TaskList = Arc<Mutex<Vec<Task>>>;
+
+#[tokio::main]
+async fn main() {
+    let task_list: TaskList = Arc::new(Mutex::new(Vec::new()));
+    let (tx, _rx) = broadcast::channel(10);
+
+    let app = Router::new()
+        .route("/ws", get(ws_handler))
+        .layer(axum::AddExtensionLayer::new((task_list, tx)));
+
+    axum::Server::bind(&"127.0.0.1:3000".parse().unwrap())
+        .serve(app.into_make_service())
+        .await
+        .unwrap();
+}
+
+/// Handles the WebSocket upgrade and passes the socket to the task message handler
+async fn ws_handler(
+    ws: WebSocketUpgrade,
+    Extension((task_list, tx)): Extension<(TaskList, broadcast::Sender<Task>)>,
+) -> impl IntoResponse {
+    ws.on_upgrade(move |socket| handle_socket(socket, task_list, tx))
+}
+
+/// Handles incoming WebSocket messages and responds with task data
+async fn handle_socket(mut socket: WebSocket, task_list: TaskList, tx: broadcast::Sender<Task>) {
+    while let Some(Ok(Message::Text(text))) = socket.next().await {
+        let new_task = create_task(text);
+        
+        add_task_to_list(new_task.clone(), &task_list);
+        broadcast_task(new_task.clone(), &tx);
+        
+        if let Err(e) = send_task_list(&mut socket, &task_list).await {
+            eprintln!("Failed to send task list: {}", e);
+            break;
+        }
+    }
+}
+
+/// Creates a new task with a unique ID
+fn create_task(title: String) -> Task {
+    Task {
+        id: Uuid::new_v4(),
+        title,
+    }
+}
+
+/// Adds the new task to the shared task list
+fn add_task_to_list(new_task: Task, task_list: &TaskList) {
+    let mut tasks = task_list.lock().unwrap();
+    tasks.push(new_task);
+}
+
+/// Broadcasts the new task to all connected clients
+fn broadcast_task(new_task: Task, tx: &broadcast::Sender<Task>) {
+    let _ = tx.send(new_task);
+}
+
+/// Sends the updated list of tasks to the WebSocket client
+async fn send_task_list(socket: &mut WebSocket, task_list: &TaskList) -> Result<(), axum::Error> {
+    let tasks = task_list.lock().unwrap().clone();
+    let json = serde_json::to_string(&tasks).unwrap();
+    socket.send(Message::Text(json)).await
+}
