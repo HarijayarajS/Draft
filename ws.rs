@@ -446,3 +446,57 @@ async fn send_task_list(socket: &mut WebSocket, task_list: &TaskList) -> Result<
     let json = serde_json::to_string(&tasks).unwrap();
     socket.send(Message::Text(json)).await
 }
+
+
+
+
+use regex::Regex;
+
+#[derive(Debug)]
+struct Task {
+    title: String,
+    description: String,
+    tags: Vec<String>,
+}
+
+fn parse_task_command(command: &str) -> Option<Task> {
+    // Regex to extract title, description, and tags
+    let re = Regex::new(
+        r"(?i)create a task with title (?P<title>.+?) description is (?P<description>.+?) and tags are (?P<tags>.+)",
+    )
+    .ok()?;
+
+    // Match the input command
+    if let Some(captures) = re.captures(command) {
+        let title = captures.name("title")?.as_str().trim().to_string();
+        let description = captures.name("description")?.as_str().trim().to_string();
+        let tags = captures
+            .name("tags")?
+            .as_str()
+            .split(',')
+            .map(|tag| tag.trim().to_string())
+            .collect();
+
+        Some(Task {
+            title,
+            description,
+            tags,
+        })
+    } else {
+        None
+    }
+}
+
+fn main() {
+    let command = "create a task with title Work description is something and tags are do, things";
+
+    match parse_task_command(command) {
+        Some(task) => {
+            println!("Parsed task: {:?}", task);
+            // Here, you can add the task to a database or in-memory storage
+        }
+        None => {
+            println!("Failed to parse task command.");
+        }
+    }
+}
