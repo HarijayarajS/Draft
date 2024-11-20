@@ -1,0 +1,110 @@
+use axum::{
+    body::Body,
+    extract::State,
+    http::StatusCode,
+    response::{Html, IntoResponse},
+    routing::{get, Router},
+};
+use hyper::Server;
+use serde_json::Value;
+use ssr_rs::Ssr;
+use std::{
+    fs::read_to_string,
+    path::Path,
+    sync::{Arc, Mutex},
+};
+use tower_http::services::ServeDir;
+use tracing::info;
+
+struct AppState {
+    ssr: Mutex<Ssr<'static, 'static>>,
+}
+
+// Initialize the SSR engine
+fn init_ssr() -> Arc<AppState> {
+    let ssr_path = Path::new("./dist/server/server.js");
+    let ssr_script = read_to_string(ssr_path)
+        .expect("Failed to read server.js file");
+
+    let ssr = Ssr::from(ssr_script)
+        .unwrap_or_else(|err| {
+            eprintln!("Failed to initialize SSR: {}", err);
+            std::process::exit(1);
+        });
+
+    Arc::new(AppState {
+        ssr: Mutex::new(ssr),
+    })
+}
+
+// Handler for the index route
+async fn index_handler(state: State<Arc<AppState>>) -> impl IntoResponse {
+    let mut ssr = state.ssr.lock().unwrap();
+    let render_result = ssr
+        .render_to_string(None)
+        .unwrap_or_else(|err| {
+            eprintln!("Error rendering to string: {}", err);
+            String::new()
+        });
+
+    if render_result.is_empty() {
+        eprintln!("Rendered result is empty");
+        return (StatusCode::INTERNAL_SERVER_ERROR, "Internal Server Error").into_response();
+    }
+
+    let json: Value = match serde_json::from_str(&render_result) {
+        Ok(val) => val,
+        Err(err) => {
+            eprintln!("Failed to parse JSON: {}", err);
+            return (StatusCode::INTERNAL_SERVER_ERROR, "Internal Server Error").into_response();
+        }
+    };
+
+    let html = json["html"].as_str().unwrap_or("");
+    let css = json["css"].as_str().unwrap_or("");
+    let full_html = format!(
+        r#"<!DOCTYPE html>
+<html>
+<head>
+    <style>{}</style>
+    <link rel="stylesheet" href="/client/assets/main.css">
+</head>
+<body>
+    <div id="svelte-app">{}</div>
+    <script type="module" src="/client/main.js"></script>
+</body>
+</html>"#,
+        css, html
+    );
+
+    Html(full_html)
+}
+
+// Main function
+#[tokio::main]
+async fn main() {
+    // Initialize tracing
+    tracing_subscriber::fmt().init();
+
+    // Initialize SSR state
+    let state = init_ssr();
+
+    // Create Axum router
+    let app = Router::new()
+        .route("/", get(index_handler))
+        .nest_service(
+            "/client/assets",
+            ServeDir::new("./dist/assets/client"),
+        )
+        .nest_service("/client", ServeDir::new("./dist/client"))
+        .with_state(state.clone());
+
+    // Start the server
+    let addr = "127.0.0.1:8000".parse().unwrap();
+    info!("Listening on http://{}", addr);
+
+    Server::bind(&addr)
+        .serve(app.into_make_service())
+        .await
+        .unwrap();
+}
