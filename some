@@ -215,3 +215,42 @@ async fn main() -> std::io::Result<()> {
     .run()
     .await
 }
+
+
+fn fetch_ditto_documents(ditto_info: DittoInfo, post_data: &serde_json::Value) -> Result<Vec<DittoFindDoc>, String> {
+    // Construct the URL
+    let url = format!("https://{}.ditto.com/", ditto_info.ditto_app_id);
+
+    // Create the HTTP request
+    let response = ureq::post(&url)
+        .set("X-DITTO-CLIENT-ID", &ditto_info.ditto_client_id)
+        .set("Authorization", &format!("Bearer {}", ditto_info.ditto_api_key))
+        .send_json(post_data.clone());
+
+    // Handle the response
+    match response {
+        Ok(resp) => {
+            if resp.status() == 200 {
+                // Parse the JSON response
+                match resp.into_json::<serde_json::Value>() {
+                    Ok(json) => {
+                        if let Some(documents) = json.get("documents") {
+                            // Deserialize documents
+                            match serde_json::from_value::<Vec<DittoFindDoc>>(documents.clone()) {
+                                Ok(docs) => Ok(docs),
+                                Err(e) => Err(format!("Failed to parse documents: {}", e)),
+                            }
+                        } else {
+                            Ok(vec![]) // Return an empty list if "documents" is missing
+                        }
+                    }
+                    Err(e) => Err(format!("Failed to parse JSON response: {}", e)),
+                }
+            } else {
+                Err(format!("Request failed with status: {}", resp.status()))
+            }
+        }
+        Err(ureq::Error::Status(code, _)) => Err(format!("Request failed with status: {}", code)),
+        Err(ureq::Error::Transport(e)) => Err(format!("Request error: {}", e)),
+    }
+}
