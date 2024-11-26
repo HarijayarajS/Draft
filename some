@@ -1,0 +1,217 @@
+
+
+use std::collections::HashMap;
+use serde::{Deserialize, Serialize};
+use actix_web::{web, App, HttpServer, HttpResponse, post};
+use log::{debug, error};
+
+#[derive(Serialize, Deserialize, Debug)]
+struct DittoFindDoc {
+    id: HashMap<String, String>,
+    fields: HashMap<String, serde_json::Value>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct DittoAuthResponse {
+    authenticate: bool,
+    expiration_seconds: u64,
+    user_id: String,
+    permissions: Permissions,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct Permissions {
+    read: PermissionDetails,
+    write: PermissionDetails,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct PermissionDetails {
+    everything: bool,
+    queries_by_collection: HashMap<String, Vec<String>>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct WebOrderAuthResponse {
+    id: String,
+    company_id: String,
+    auth_id: String,
+    access: AuthCompanyAccess,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct AuthCompanyAccess {
+    r#type: String,
+    ident: String,
+    order_type: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct DittoInfo {
+    ditto_app_id: String,
+    ditto_client_id: String,
+    ditto_api_key: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct HttpJsonData {
+    collection: String,
+    query: String,
+    args: HashMap<String, serde_json::Value>,
+    limit: Option<u32>,
+    offset: Option<u32>,
+    sort: Vec<Sort>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct Sort {
+    property: String,
+    direction: String,
+}
+
+async fn ditto_user_permission(company_id: &str, access_id: &str) -> Result<DittoAuthResponse, String> {
+    let mut read: HashMap<String, Vec<String>> = HashMap::new();
+    let mut write: HashMap<String, Vec<String>> = HashMap::new();
+
+    let comp_queries = vec![format!("_id.companyId == '{}'", company_id)];
+
+    read.insert("heartbeat".to_string(), vec!["true".to_string()]);
+    read.insert("heartbeatping".to_string(), comp_queries.clone());
+    write.insert("heartbeatping".to_string(), comp_queries.clone());
+    read.insert("company".to_string(), vec![format!("_id.docId == '{}'", company_id)]);
+    read.insert("companyaccess".to_string(), vec![format!("_id.docId == '{}'", access_id)]);
+
+    let read_cols = vec![
+        "applicationsetting", "weborderwidget", "product", "category", "productattribute",
+        "activeorder", "activepayment", "blackboxrequest", "ordersetting", "bundle",
+        "giftcard", "giftcardusage", "translator", "reservation", "reservationsetting",
+        "location", "productdeal",
+    ];
+
+    for col in read_cols {
+        read.insert(col.to_string(), comp_queries.clone());
+    }
+
+    let write_cols = vec![
+        "activeorder", "activepayment", "blackboxrequest", "giftcardusage",
+        "orderhistoryinfo", "reservation",
+    ];
+
+    for col in write_cols {
+        write.insert(col.to_string(), comp_queries.clone());
+    }
+
+    Ok(DittoAuthResponse {
+        authenticate: true,
+        expiration_seconds: 7 * 24 * 60 * 60, // 7 days
+        user_id: access_id.to_string(),
+        permissions: Permissions {
+            read: PermissionDetails {
+                everything: false,
+                queries_by_collection: read,
+            },
+            write: PermissionDetails {
+                everything: false,
+                queries_by_collection: write,
+            },
+        },
+    })
+}
+
+async fn ditto_base_find(
+    ditto_info: &DittoInfo,
+    collection: &str,
+    query: &str,
+    args: HashMap<String, serde_json::Value>,
+    limit: Option<u32>,
+    sort_key: Option<&str>,
+    offset: Option<u32>,
+    is_sort_dec: Option<bool>,
+) -> Result<Vec<DittoFindDoc>, String> {
+    let mut post_data = HttpJsonData {
+        collection: collection.to_string(),
+        query: query.to_string(),
+        args,
+        limit,
+        offset,
+        sort: vec![Sort {
+            property: sort_key.unwrap_or("createdOn").to_string(),
+            direction: if is_sort_dec.unwrap_or(false) { "desc" } else { "asc" }.to_string(),
+        }],
+    };
+
+    let client = reqwest::Client::new();
+    let url = format!("https://{}.ditto.com/", ditto_info.ditto_app_id);
+    let response = client.post(&url)
+        .header("X-DITTO-CLIENT-ID", &ditto_info.ditto_client_id)
+        .header("Authorization", format!("Bearer {}", ditto_info.ditto_api_key))
+        .json(&post_data)
+        .send()
+        .await;
+
+    match response {
+        Ok(resp) if resp.status().is_success() => {
+            let json: serde_json::Value = resp.json().await.unwrap();
+            if let Some(documents) = json.get("documents") {
+                let docs: Vec<DittoFindDoc> = serde_json::from_value(documents.clone()).unwrap();
+                Ok(docs)
+            } else {
+                Ok(vec![])
+            }
+        }
+        Ok(resp) => Err(format!("Request failed with status: {}", resp.status())),
+        Err(e) => Err(format!("Request error: {}", e)),
+    }
+}
+
+#[post("/weborder_auth_verify")]
+async fn weborder_auth_verify(web::Json(payload): web::Json<HashMap<String, String>>) -> HttpResponse {
+    let api_key = payload.get("token").unwrap_or(&"".to_string()).clone();
+    let ditto_info = DittoInfo {
+        ditto_app_id: "app_id".to_string(),
+        ditto_client_id: "client_id".to_string(),
+        ditto_api_key: "api_key".to_string(),
+    };
+
+    match ditto_base_find(
+        &ditto_info,
+        "companyaccess",
+        "apiKey == $args.apiKey",
+        [("apiKey".to_string(), serde_json::Value::String(api_key.clone()))].iter().cloned().collect(),
+        Some(1),
+        None,
+        None,
+        None,
+    ).await {
+        Ok(docs) if !docs.is_empty() => {
+            let doc = &docs[0];
+            let auth_resp = WebOrderAuthResponse {
+                id: doc.id.get("docId").unwrap_or(&"".to_string()).clone(),
+                company_id: doc.id.get("companyId").unwrap_or(&"".to_string()).clone(),
+                auth_id: doc.fields.get("authId").and_then(|v| v.as_str()).unwrap_or("").to_string(),
+                access: AuthCompanyAccess {
+                    r#type: doc.fields.get("type").and_then(|v| v.as_str()).unwrap_or("").to_string(),
+                    ident: doc.fields.get("ident").and_then(|v| v.as_str()).unwrap_or("").to_string(),
+                    order_type: doc.fields.get("orderType").and_then(|v| v.as_str()).unwrap_or("").to_string(),
+                },
+            };
+
+            match ditto_user_permission(&auth_resp.company_id, &auth_resp.id).await {
+                Ok(permission) => HttpResponse::Ok().json(permission),
+                Err(e) => HttpResponse::InternalServerError().body(e),
+            }
+        }
+        _ => HttpResponse::Unauthorized().body("Invalid API key"),
+    }
+}
+
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    HttpServer::new(|| {
+        App::new()
+            .service(weborder_auth_verify)
+    })
+    .bind("127.0.0.1:8080")?
+    .run()
+    .await
+}
