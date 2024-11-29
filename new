@@ -67,3 +67,77 @@ async fn shutdown_signal(shutdown_tx: watch::Sender<bool>, cloned_db_manager: DB
 
     println!("Shutdown complete.");
 }
+
+
+use tokio::sync::watch;
+use tokio::sync::Notify;
+use axum::{Router, Extension};
+use std::sync::Arc;
+use tokio::net::TcpListener;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    dotenvy::dotenv()?;
+    let app_env = option_env!("APP_ENV").unwrap_or("staging");
+    let api_key = std::env::var("API_KEY").context("Unable to find API_KEY")?;
+    let server_host = std::env::var("APP_HOST").unwrap_or("127.0.0.1".to_string());
+    let server_port = std::env::var("APP_PORT").unwrap_or("8000".to_string());
+    let env_is_live = app_env == "live";
+
+    let _guard = init_tracing(env_is_live)?;
+
+    let mut db_manager = DBManager::new(env_is_live, &api_key).await?;
+    let cloned_db_manager = db_manager.clone();
+
+    // Create a shutdown signal
+    let (shutdown_tx, shutdown_rx) = watch::channel(false);
+
+    // Spawn a background task for the DBManager with shutdown handling
+    tokio::spawn(async move {
+        let mut shutdown_rx = shutdown_rx.clone();
+        tokio::select! {
+            result = db_manager.start() => {
+                if let Err(err) = result {
+                    println!("DBManager error: {:?}", err);
+                }
+            }
+            _ = shutdown_rx.changed() => {
+                println!("Shutdown signal received for DBManager");
+            }
+        }
+        db_manager.stop().await.unwrap_or_else(|err| {
+            println!("Error stopping DBManager: {:?}", err);
+        });
+    });
+
+    let app_state = AppState {
+        db_manager: cloned_db_manager.clone(),
+        jwt_config: JwtConfig::new()?,
+        auth_config: AuthConfig::new()?,
+    };
+
+    let app = route::build().layer(Extension(Arc::new(app_state)));
+
+    println!("Server starting at {}:{}", server_host, server_port);
+
+    let server_host = format!("{}:{}", server_host, server_port);
+    let listener = TcpListener::bind(&server_host).await?;
+    axum::Server::from_tcp(listener)?
+        .serve(app.into_make_service())
+        .with_graceful_shutdown(shutdown_signal(shutdown_tx))
+        .await?;
+
+    Ok(())
+}
+
+async fn shutdown_signal(shutdown_tx: watch::Sender<bool>) {
+    tokio::signal::ctrl_c()
+        .await
+        .expect("Failed to install Ctrl+C handler");
+
+    println!("Shutdown initiated.");
+    let _ = shutdown_tx.send(true); // Notify the background task
+    println!("Shutdown signal sent.");
+}
+
+
