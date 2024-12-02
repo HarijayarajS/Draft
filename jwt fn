@@ -1,0 +1,102 @@
+use jsonwebtoken::{decode, DecodingKey, Validation};
+use serde::{Deserialize, Serialize};
+use std::sync::Arc;
+use tracing_subscriber;
+
+// State to hold shared configuration
+#[derive(Clone)]
+struct AppState {
+    jwt_secret: String,
+}
+
+// Request and Response Types
+#[derive(Deserialize)]
+struct PrintVerifyRequest {
+    token: String,
+}
+
+#[derive(Serialize)]
+struct PrintVerifyResponse {
+    authenticate: bool,
+    user_info: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct JwtClaims {
+    auth_id: String,
+    company_id: String,
+}
+
+// Main handler for print verify
+async fn handler_print_verify(
+    state: Arc<AppState>,
+    payload: PrintVerifyRequest,
+) -> Result<PrintVerifyResponse, String> {
+    let auth_info = &state.jwt_secret;
+
+    // Verify the token
+    match print_token_verify(&payload.token, auth_info).await {
+        Ok(decoded) => {
+            // Check permissions (dummy example)
+            let has_permission = ditto_user_permission("printserver", &decoded.auth_id);
+            if has_permission {
+                Ok(PrintVerifyResponse {
+                    authenticate: true,
+                    user_info: format!(
+                        "User authorized: auth_id={}, company_id={}",
+                        decoded.auth_id, decoded.company_id
+                    ),
+                })
+            } else {
+                Err("User lacks permission".into())
+            }
+        }
+        Err(err) => Err(err),
+    }
+}
+
+// Token verification function
+async fn print_token_verify(token: &str, jwt_secret: &str) -> Result<JwtClaims, String> {
+    decode::<JwtClaims>(
+        token,
+        &DecodingKey::from_secret(jwt_secret.as_ref()),
+        &Validation::default(),
+    )
+    .map(|data| data.claims)
+    .map_err(|err| format!("Invalid token: {}", err))
+}
+
+// Mock permission check function
+fn ditto_user_permission(_service: &str, _auth_id: &str) -> bool {
+    // Replace with actual permission logic
+    true
+}
+
+#[tokio::main]
+async fn main() {
+    // Initialize tracing for logs
+    tracing_subscriber::fmt::init();
+
+    // Shared application state
+    let app_state = Arc::new(AppState {
+        jwt_secret: "your_jwt_secret_here".to_string(),
+    });
+
+    // Mock payload
+    let payload = PrintVerifyRequest {
+        token: "your_jwt_token_here".to_string(),
+    };
+
+    // Call the handler function
+    match handler_print_verify(app_state, payload).await {
+        Ok(response) => {
+            println!(
+                "Authentication successful: {}",
+                serde_json::to_string_pretty(&response).unwrap()
+            );
+        }
+        Err(error) => {
+            println!("Authentication failed: {}", error);
+        }
+    }
+}
