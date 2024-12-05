@@ -1,0 +1,49 @@
+use std::sync::Arc;
+use uuid::Uuid;
+
+/// Struct representing a task.
+#[derive(Debug, Clone)]
+pub struct Task {
+    pub id: Uuid,
+    pub title: String,
+    pub description: Option<String>,
+}
+
+/// Trait defining a behavior for handling tasks.
+pub trait TaskHandler: Send + Sync {
+    fn process_task(&self, title: &str, description: Option<&str>) -> Task;
+}
+
+/// Struct that holds a trait object implementing `TaskHandler`.
+pub struct TaskProcessor {
+    pub handler: Arc<dyn TaskHandler>,
+}
+
+/// Function to create a task using a `TaskProcessor`.
+pub fn create_with_trait(processor: TaskProcessor, title: &str, description: Option<&str>) -> Task {
+    processor.handler.process_task(title, description)
+}
+
+/// Struct implementing the `TaskHandler` trait.
+struct MyTaskHandler;
+
+impl TaskHandler for MyTaskHandler {
+    fn process_task(&self, title: &str, description: Option<&str>) -> Task {
+        Task {
+            id: Uuid::new_v4(),
+            title: title.to_string(),
+            description: description.map(String::from),
+        }
+    }
+}
+
+fn main() {
+    // Create a TaskProcessor with a handler.
+    let handler = Arc::new(MyTaskHandler);
+    let processor = TaskProcessor { handler };
+
+    // Create a task using the processor.
+    let task = create_with_trait(processor, "Learn Rust", Some("Explore Rust's basics."));
+
+    println!("Created Task: {:?}", task);
+}
