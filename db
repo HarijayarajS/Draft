@@ -1,0 +1,45 @@
+use couchbase_lite::{Database, Document};
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize, Debug)]
+struct Task {
+    title: String,
+    completed: bool,
+}
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // 1. Initialize or open a database
+    let db_name = "task_manager";
+    let db_path = std::env::current_dir()?.join(format!("{}.cblite2", db_name));
+    let db = Database::open_or_create(db_path)?;
+
+    println!("Database initialized: {}", db_name);
+
+    // 2. Create a task document
+    let task = Task {
+        title: "Learn Couchbase Lite".to_string(),
+        completed: false,
+    };
+
+    let mut doc = Document::new();
+    doc.body_mut().insert("task", &task)?;
+    db.save_document(&mut doc)?;
+
+    println!("Task document saved with ID: {}", doc.id());
+
+    // 3. Retrieve the document by ID
+    if let Some(saved_doc) = db.get_document(&doc.id())? {
+        println!("Retrieved document: {:?}", saved_doc.body());
+    } else {
+        println!("Document not found.");
+    }
+
+    // 4. Query all documents
+    println!("\nListing all documents:");
+    for result in db.query("SELECT meta.id, * FROM _default")? {
+        let row = result?;
+        println!("{:?}", row);
+    }
+
+    Ok(())
+}
