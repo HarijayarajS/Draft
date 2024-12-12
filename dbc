@@ -1,0 +1,40 @@
+use some_database_library::{Database, DatabaseFlags};
+use std::sync::{Arc, Mutex};
+use std::path::Path;
+
+struct CouchDB {
+    db: Arc<Mutex<Database>>, // Shared and thread-safe database connection
+}
+
+impl CouchDB {
+    /// Create a new instance of `CouchDB` and initialize the database connection
+    fn new(path: &str) -> Self {
+        let db_path = Path::new(path);
+        let db = Database::open_with_flags(&db_path, DatabaseFlags::CREATE).unwrap();
+        Self {
+            db: Arc::new(Mutex::new(db)),
+        }
+    }
+
+    /// Get the database connection (thread-safe access)
+    fn get_connection(&self) -> Arc<Mutex<Database>> {
+        Arc::clone(&self.db)
+    }
+
+    /// Example function to perform operations on the database
+    fn perform_operation(&self) {
+        let db = self.db.lock().unwrap();
+        // Perform some database operations using `db`
+        println!("Performing operation on the database");
+    }
+}
+
+#[tokio::test]
+async fn test_create_device() {
+    // Initialize CouchDB with a single connection
+    let couchdb = CouchDB::new("/path/to/database");
+
+    // Reuse the connection to perform operations
+    couchdb.perform_operation();
+    couchdb.perform_operation(); // Another operation using the same connection
+}
