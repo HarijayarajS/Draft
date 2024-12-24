@@ -1,0 +1,58 @@
+use std::collections::HashMap;
+use serde_json::Value;
+
+struct DbService {
+    db: HashMap<String, Vec<Value>>, // Simulating database
+}
+
+impl DbService {
+    fn get_by_query_sync(&self, collection: &str, _query: &str) -> Vec<Value> {
+        self.db.get(collection).cloned().unwrap_or_else(Vec::new)
+    }
+}
+
+struct MyApp {
+    db_service: DbService,
+}
+
+impl MyApp {
+    pub fn get_take_away_printer_ids(&self) -> Vec<String> {
+        if let Some(doc) = self
+            .db_service
+            .get_by_query_sync("applicationSetting", "")
+            .first()
+        {
+            if let Some(take_away_doc) = doc.get("takeAway").and_then(|v| v.as_object()) {
+                return take_away_doc
+                    .get("printers")
+                    .and_then(|printers| printers.as_array())
+                    .map(|array| {
+                        array
+                            .iter()
+                            .filter_map(|item| item.as_str().map(String::from))
+                            .collect()
+                    })
+                    .unwrap_or_else(Vec::new);
+            }
+        }
+        Vec::new()
+    }
+}
+
+fn main() {
+    let mut db = HashMap::new();
+    db.insert(
+        "applicationSetting".to_string(),
+        vec![serde_json::json!({
+            "takeAway": {
+                "printers": ["printer1", "printer2", "printer3"]
+            }
+        })],
+    );
+
+    let db_service = DbService { db };
+    let app = MyApp { db_service };
+
+    let printer_ids = app.get_take_away_printer_ids();
+    println!("{:?}", printer_ids); // Output: ["printer1", "printer2", "printer3"]
+}
