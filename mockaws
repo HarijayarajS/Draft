@@ -44,3 +44,66 @@ mod tests {
         assert!(result.is_err());
     }
 }
+
+
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use aws_sdk_ec2::error::StartInstancesError;
+    use aws_sdk_ec2::operation::start_instances::StartInstancesOutput;
+    use aws_sdk_ec2::types::SdkError;
+    use mockall::mock;
+    use mockall::predicate::*;
+
+    // Mock the AWS EC2 Client
+    mock! {
+        pub Ec2Client {}
+        #[async_trait::async_trait]
+        impl aws_sdk_ec2::Client for Ec2Client {
+            async fn start_instances(
+                &self,
+                request: aws_sdk_ec2::operation::start_instances::StartInstancesInput,
+            ) -> Result<StartInstancesOutput, SdkError<StartInstancesError>>;
+        }
+    }
+
+    #[tokio::test]
+    async fn test_stat_server_success() {
+        let instance_id = "test-instance-id";
+
+        // Mock client with successful response
+        let mut mock_client = MockEc2Client::new();
+        mock_client
+            .expect_start_instances()
+            .returning(|_| Ok(StartInstancesOutput::builder().build()));
+
+        // Inject the mock client and call the function
+        let result = stat_server(instance_id).await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_stat_server_failure() {
+        let instance_id = "test-instance-id";
+
+        // Mock client with error response
+        let mut mock_client = MockEc2Client::new();
+        mock_client
+            .expect_start_instances()
+            .returning(|_| {
+                Err(SdkError::ServiceError {
+                    err: StartInstancesError::builder().message("Failed to start instance").build(),
+                })
+            });
+
+        // Inject the mock client and call the function
+        let result = stat_server(instance_id).await;
+        assert!(result.is_err());
+        if let Err(ApiError::Error(err)) = result {
+            assert!(err.contains("Failed to start instance"));
+        }
+    }
+}
+
