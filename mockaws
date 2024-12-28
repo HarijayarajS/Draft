@@ -1,0 +1,46 @@
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use aws_sdk_ec2::types::SdkError;
+    use aws_sdk_ec2::operation::start_instances::StartInstancesOutput;
+    use mockall::{mock, predicate::*};
+
+    // Mock the EC2 Client
+    mock! {
+        pub Ec2Client {}
+        #[async_trait::async_trait]
+        impl aws_sdk_ec2::client::fluent_builders::StartInstances for Ec2Client {
+            async fn send(&self) -> Result<StartInstancesOutput, SdkError<()>>;
+        }
+    }
+
+    #[tokio::test]
+    async fn test_stat_server_success() {
+        let instance_id = "test-instance-id";
+
+        // Mock client with successful response
+        let mut mock_client = MockEc2Client::new();
+        mock_client
+            .expect_send()
+            .returning(|| Ok(StartInstancesOutput::builder().build()));
+
+        // Call the function and assert success
+        let result = stat_server(instance_id).await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_stat_server_failure() {
+        let instance_id = "test-instance-id";
+
+        // Mock client with error response
+        let mut mock_client = MockEc2Client::new();
+        mock_client
+            .expect_send()
+            .returning(|| Err(SdkError::ServiceError { err: "Some error".into() }));
+
+        // Call the function and assert failure
+        let result = stat_server(instance_id).await;
+        assert!(result.is_err());
+    }
+}
