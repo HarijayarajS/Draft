@@ -85,3 +85,118 @@ fn main() {
         }
     }
 }
+
+
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs::{self, File};
+    use std::io::Write;
+    use std::path::Path;
+
+    fn setup_test_environment() -> (PathBuf, PathBuf) {
+        // Create temporary directories for testing
+        let src_dir = PathBuf::from("test_src");
+        let dest_dir = PathBuf::from("test_dest");
+
+        // Ensure they are clean before the test
+        if src_dir.exists() {
+            fs::remove_dir_all(&src_dir).unwrap();
+        }
+        if dest_dir.exists() {
+            fs::remove_dir_all(&dest_dir).unwrap();
+        }
+
+        fs::create_dir_all(&src_dir).unwrap();
+        fs::create_dir_all(&dest_dir).unwrap();
+
+        // Create test files in the source directory
+        let file_path = src_dir.join("test_file.txt");
+        let mut file = File::create(&file_path).unwrap();
+        writeln!(file, "Test content").unwrap();
+
+        let sub_dir = src_dir.join("sub_dir");
+        fs::create_dir_all(&sub_dir).unwrap();
+
+        let sub_file_path = sub_dir.join("sub_test_file.txt");
+        let mut sub_file = File::create(&sub_file_path).unwrap();
+        writeln!(sub_file, "Subdirectory content").unwrap();
+
+        (src_dir, dest_dir)
+    }
+
+    #[test]
+    fn test_copy_folder_success() {
+        let (src_dir, dest_dir) = setup_test_environment();
+
+        // Call the function
+        copy_folder(src_dir.to_str().unwrap(), dest_dir.clone()).unwrap();
+
+        // Assert that the files were copied
+        assert!(dest_dir.join("test_file.txt").exists());
+        assert!(dest_dir.join("sub_dir").exists());
+        assert!(dest_dir.join("sub_dir/sub_test_file.txt").exists());
+
+        // Clean up
+        fs::remove_dir_all(src_dir).unwrap();
+        fs::remove_dir_all(dest_dir).unwrap();
+    }
+
+    #[test]
+    fn test_copy_folder_source_not_found() {
+        let dest_dir = PathBuf::from("test_dest");
+
+        // Ensure destination directory exists
+        if dest_dir.exists() {
+            fs::remove_dir_all(&dest_dir).unwrap();
+        }
+        fs::create_dir_all(&dest_dir).unwrap();
+
+        let result = copy_folder("non_existent_folder", dest_dir);
+
+        assert!(result.is_err());
+        assert_eq!(
+            result.unwrap_err().kind(),
+            std::io::ErrorKind::NotFound
+        );
+
+        // Clean up
+        fs::remove_dir_all(dest_dir).unwrap();
+    }
+
+    #[test]
+    fn test_setup_command() {
+        let (src_dir, dest_dir) = setup_test_environment();
+
+        // Simulate `setup` command
+        if let Err(e) = copy_folder(src_dir.to_str().unwrap(), dest_dir.clone()) {
+            panic!("Setup command failed: {}", e);
+        }
+
+        assert!(dest_dir.join("test_file.txt").exists());
+        assert!(dest_dir.join("sub_dir/sub_test_file.txt").exists());
+
+        // Clean up
+        fs::remove_dir_all(src_dir).unwrap();
+        fs::remove_dir_all(dest_dir).unwrap();
+    }
+
+    #[test]
+    fn test_cargo_command() {
+        let (src_dir, dest_dir) = setup_test_environment();
+
+        // Simulate `cargo` command
+        if let Err(e) = copy_folder(src_dir.to_str().unwrap(), dest_dir.clone()) {
+            panic!("Cargo command failed: {}", e);
+        }
+
+        assert!(dest_dir.join("test_file.txt").exists());
+        assert!(dest_dir.join("sub_dir/sub_test_file.txt").exists());
+
+        // Clean up
+        fs::remove_dir_all(src_dir).unwrap();
+        fs::remove_dir_all(dest_dir).unwrap();
+    }
+}
