@@ -100,3 +100,22 @@ Contributions are welcome! Please fork the repository and submit a pull request 
 
 This README.md provides users with clear instructions for installing, using, and developing your project. Replace <repository_url> with the actual URL of your repository.
 
+
+
+
+| Error Code                     | Message                                                                  |
+|--------------------------------|--------------------------------------------------------------------------|
+| otpErrorResendPeriod           | Cannot resend OTP now, please try again after 10 seconds                |
+| otpErrorResendNotExists        | E-mail OTP verification with id '10' doesn't exist                      |
+| otpErrorInvalid                | Invalid OTP                                                             |
+| otpErrorExpired                | OTP Expired                                                             |
+| otpErrorAccountBlocked         | Your E-mail address is blocked, please contact our support team         |
+| otpErrorAccountLocked          | Account has been locked for 1 hours and 5 minutes                       |
+| otpErrorIpBlocked              | Your IP address is blocked, please contact our support team             |
+| passwordErrorAccountDisabled   | Your account is disabled                                                |
+| passwordErrorAccountLocked     | Account has been locked for 10 minutes                                  |
+| passwordErrorInvalid           | Invalid E-mail or password                                              |
+| passwordErrorResetMismatch     | New password cannot be same as old password                             |
+| passwordErrorResetInvalid      | Invalid current password                                                |
+| passwordErrorAlreadyUsed       | Already used                                                            |
+| passwordErrorNotValid          | Validation error                                                        |
