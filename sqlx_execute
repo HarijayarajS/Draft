@@ -1,3 +1,7 @@
+
+
+
+
 Here's how you can build your Axum-based web application:
 
 Tech Stack
@@ -230,4 +234,13 @@ Minimalistic and Fast
 
 
 Let me know if you need any modifications!
+
+let result: Vec<_> = rows.iter().map(|row| {
+    let mut json_row = serde_json::Map::new();
+    for (i, column) in row.columns().iter().enumerate() {
+        let value: Result<String, _> = row.try_get(i);
+        json_row.insert(column.name().to_string(), serde_json::json!(value.unwrap_or_default()));
+    }
+    serde_json::Value::Object(json_row)
+}).collect();
 
