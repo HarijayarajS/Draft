@@ -1,0 +1,233 @@
+Here's how you can build your Axum-based web application:
+
+Tech Stack
+
+Backend: Rust (Axum, SQLx)
+
+Frontend: HTML, CSS (Dark theme), JavaScript (fetch API)
+
+Database: PostgreSQL
+
+
+
+---
+
+Steps to Implement
+
+1. Set Up the Axum Server
+
+Serve a static HTML page.
+
+Use SQLx to manage PostgreSQL queries.
+
+Provide routes for executing queries and managing the connection.
+
+
+
+2. Frontend UI (Dark Theme)
+
+A simple input box for SQL queries.
+
+Buttons to Run Query, Start DB Connection, and Stop DB Connection.
+
+Display results dynamically.
+
+
+
+
+
+---
+
+Backend Code (Rust + Axum + SQLx)
+
+use axum::{
+    extract::{Extension, Json},
+    routing::{get, post},
+    Router,
+};
+use serde::{Deserialize, Serialize};
+use sqlx::{PgPool, Pool, Postgres};
+use std::{net::SocketAddr, sync::Arc};
+use tokio::sync::Mutex;
+
+#[derive(Clone)]
+struct AppState {
+    db: Arc<Mutex<Option<PgPool>>>,
+}
+
+#[tokio::main]
+async fn main() {
+    let state = AppState {
+        db: Arc::new(Mutex::new(None)),
+    };
+
+    let app = Router::new()
+        .route("/", get(index))
+        .route("/query", post(execute_query))
+        .route("/start_db", post(start_db))
+        .route("/stop_db", post(stop_db))
+        .layer(Extension(state));
+
+    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    println!("Listening on {}", addr);
+    axum::Server::bind(&addr)
+        .serve(app.into_make_service())
+        .await
+        .unwrap();
+}
+
+async fn index() -> &'static str {
+    include_str!("index.html") // Serve the frontend
+}
+
+#[derive(Deserialize)]
+struct QueryInput {
+    query: String,
+}
+
+#[derive(Serialize)]
+struct QueryOutput {
+    result: Vec<serde_json::Value>,
+    error: Option<String>,
+}
+
+async fn execute_query(
+    Extension(state): Extension<AppState>,
+    Json(input): Json<QueryInput>,
+) -> Json<QueryOutput> {
+    let db = state.db.lock().await;
+    if let Some(pool) = db.as_ref() {
+        match sqlx::query(&input.query).fetch_all(pool).await {
+            Ok(rows) => {
+                let result: Vec<_> = rows
+                    .iter()
+                    .map(|row| serde_json::to_value(row).unwrap_or_default())
+                    .collect();
+                Json(QueryOutput { result, error: None })
+            }
+            Err(e) => Json(QueryOutput {
+                result: vec![],
+                error: Some(e.to_string()),
+            }),
+        }
+    } else {
+        Json(QueryOutput {
+            result: vec![],
+            error: Some("Database connection is not active.".to_string()),
+        })
+    }
+}
+
+async fn start_db(Extension(state): Extension<AppState>) -> &'static str {
+    let pool = PgPool::connect("postgres://user:password@localhost/db_name")
+        .await
+        .ok();
+    *state.db.lock().await = pool;
+    "Database connection started"
+}
+
+async fn stop_db(Extension(state): Extension<AppState>) -> &'static str {
+    *state.db.lock().await = None;
+    "Database connection stopped"
+}
+
+
+---
+
+Frontend Code (index.html)
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Query Executor</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        input, button {
+            margin: 10px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        input {
+            width: 80%;
+            background-color: #222;
+            color: white;
+            border: 1px solid #444;
+        }
+        button {
+            background-color: #333;
+            color: white;
+            border: 1px solid #555;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #444;
+        }
+        pre {
+            background: #222;
+            padding: 10px;
+            border: 1px solid #555;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>SQL Query Executor</h1>
+    <input type="text" id="query" placeholder="Enter your SQL query">
+    <br>
+    <button onclick="runQuery()">Run Query</button>
+    <button onclick="startDB()">Start DB</button>
+    <button onclick="stopDB()">Stop DB</button>
+    <h2>Output:</h2>
+    <pre id="output"></pre>
+
+    <script>
+        async function runQuery() {
+            let query = document.getElementById("query").value;
+            let response = await fetch("/query", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ query })
+            });
+            let data = await response.json();
+            document.getElementById("output").innerText = 
+                data.error ? "Error: " + data.error : JSON.stringify(data.result, null, 2);
+        }
+
+        async function startDB() {
+            await fetch("/start_db", { method: "POST" });
+            alert("Database connection started");
+        }
+
+        async function stopDB() {
+            await fetch("/stop_db", { method: "POST" });
+            alert("Database connection stopped");
+        }
+    </script>
+</body>
+</html>
+
+
+---
+
+Features
+
+Dark Mode UI
+
+Single Input for SQL Queries
+
+Start/Stop DB Connection
+
+Results Displayed in a Preformatted Box
+
+Minimalistic and Fast
+
+
+Let me know if you need any modifications!
+
