@@ -37,3 +37,31 @@ fn main() {
     }
 }
 
+
+
+
+use chrono::{Utc, TimeZone};
+use chrono_tz::Tz;
+
+fn get_timezone_offset_seconds(tz_str: &str) -> Result<i32, String> {
+    // Parse the timezone string into a Tz type
+    let tz: Tz = tz_str.parse().map_err(|_| format!("Invalid timezone: {}", tz_str))?;
+
+    // Get the current UTC time
+    let now = Utc::now();
+
+    // Convert the UTC time to the specified timezone
+    let local_time = tz.from_utc_datetime(&now.naive_utc());
+
+    // Get the offset in seconds
+    let offset = local_time.offset().fix().local_minus_utc();
+
+    Ok(offset)
+}
+
+fn main() {
+    match get_timezone_offset_seconds("America/New_York") {
+        Ok(offset) => println!("Current offset in seconds: {}", offset),
+        Err(e) => eprintln!("Error: {}", e),
+    }
+}
