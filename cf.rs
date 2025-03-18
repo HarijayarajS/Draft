@@ -146,3 +146,62 @@ Why Use cf-turnstile?
 
 This is the simplest way to integrate Cloudflare Turnstile in Rust with Axum.
 
+
+
+Yes! Cloudflare provides a test mode for Turnstile, allowing you to bypass CAPTCHA verification without needing a real secret key.
+
+Test Credentials
+
+Site Key for Testing: 1x00000000000000000000AA
+
+Secret Key for Testing: 1x0000000000000000000000000000000AA
+
+
+Steps for Testing
+
+1. Update Your .env File
+
+Set the test secret key in your .env file:
+
+TURNSTILE_SECRET=1x0000000000000000000000000000000AA
+
+2. Use the Test Site Key in Your Frontend
+
+Update your signup form with the test site key:
+
+<div class="cf-turnstile" data-sitekey="1x00000000000000000000AA"></div>
+
+
+---
+
+3. Expected Behavior
+
+Any CAPTCHA response will always pass when using this test key.
+
+This is useful for local development and debugging.
+
+
+
+---
+
+4. Proceed with Your Rust Backend
+
+You can now test your Rust server without worrying about failed CAPTCHA validation. If you later deploy to production, just replace the site key and secret key with real ones from Cloudflare.
+
+
+---
+
+Next Steps
+
+1. Test your local signup flow.
+
+
+2. Once ready, switch to real keys from Cloudflare.
+
+
+3. Deploy your Rust backend securely.
+
+
+
+Let me know if you need any help!
+
