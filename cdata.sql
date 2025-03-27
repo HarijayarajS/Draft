@@ -1,3 +1,5 @@
+
+
 INSERT INTO course_topic (course_id, title, summary, sort_no, category) VALUES  
 
 -- Python Course  
@@ -72,3 +74,18 @@ INSERT INTO course_topic (course_id, title, summary, sort_no, category) VALUES
 (6, 'App Performance Optimization', 'Improving speed and efficiency', 8, 'Mobile Optimization'),  
 (6, 'Mobile Payments', 'Integrating Stripe and PayPal in apps', 9, 'Mobile Features'),  
 (6, 'AR/VR in Mobile', 'Building augmented and virtual reality apps', 10, 'Advanced Mobile Development');
+
+
+INSERT INTO faq (id, question, answer, sort_number) VALUES
+(1, 'What is this app?', 'This is an AI-driven course app that provides personalized learning experiences.', 1),
+(2, 'How does AI enhance my learning?', 'The AI adapts course recommendations, quizzes, and pacing based on your progress.', 2),
+(3, 'What types of courses are available?', 'The app offers courses in various fields like programming, business, and design.', 3),
+(4, 'How do I enroll in a course?', 'You can browse the catalog, select a course, and start learning instantly.', 4),
+(5, 'Can I track my progress?', 'Yes, the app provides insights into your progress and suggests areas for improvement.', 5),
+(6, 'Does the app offer certifications?', 'Some courses provide certificates upon completion.', 6),
+(7, 'Is there an AI tutor available?', 'Yes, an AI tutor assists with doubts and provides explanations.', 7),
+(8, 'Can I customize my learning path?', 'Yes, you can set goals, preferences, and pace to adjust your experience.', 8),
+(9, 'Does the app work offline?', 'Some courses can be downloaded for offline learning.', 9),
+(10, 'How can I reset my progress?', 'You can reset your progress from settings or contact support.', 10),
+(11, 'Is there a mobile version?', 'Yes, the app is available on iOS, Android, and the web.', 11),
+(12, 'What should I do if I encounter an issue?', 'Contact support through the app or visit the help center.', 12);
