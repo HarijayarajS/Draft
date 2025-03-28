@@ -1,5 +1,8 @@
 
 
+
+
+
 INSERT INTO course_topic (course_id, title, summary, sort_no, category) VALUES  
 
 -- Python Course  
@@ -89,3 +92,35 @@ INSERT INTO faq (id, question, answer, sort_number) VALUES
 (10, 'How can I reset my progress?', 'You can reset your progress from settings or contact support.', 10),
 (11, 'Is there a mobile version?', 'Yes, the app is available on iOS, Android, and the web.', 11),
 (12, 'What should I do if I encounter an issue?', 'Contact support through the app or visit the help center.', 12);
+
+
+
+
+
+INSERT INTO page_content_block (page_id, title, content, sort_no, is_published) 
+VALUES 
+-- Home Page
+(1, 'Intro', '<h3>We offer AI-driven, cloud, and mobile solutions.</h3>', 1, TRUE),
+(1, 'Why Us', '<h3>Reliable and Innovative Solutions</h3>', 2, TRUE),
+(1, 'Services / Tech', '<h3>Our cutting-edge technology stack</h3>', 3, TRUE),
+(1, 'Projects / Clients', '<h3>Our successful case studies</h3>', 4, TRUE),
+(1, 'Contact', '<h3>Get in touch with us</h3>', 5, TRUE),
+
+-- What We Do Page
+(2, 'About Services', '<h3>Learn about our services</h3>', 1, TRUE),
+(2, 'Process', '<h3>How we work</h3>', 2, TRUE),
+(2, 'AI Applications', '<h3>Our AI-driven solutions</h3>', 3, TRUE),
+(2, 'Cloud Applications', '<h3>Scalable cloud solutions</h3>', 4, TRUE),
+(2, 'Mobile Apps', '<h3>Native mobile development</h3>', 5, TRUE),
+(2, 'Contact', '<h3>Reach out for partnerships</h3>', 6, TRUE),
+
+-- About Page
+(3, 'Company Intro', '<h3>We are a leading tech firm</h3>', 1, TRUE),
+(3, 'Vision & Mission', '<h3>Innovating for a better future</h3>', 2, TRUE),
+(3, 'Process & History', '<h3>Our journey and achievements</h3>', 3, TRUE),
+(3, 'Technical Expertise', '<h3>Our skilled team and stack</h3>', 4, TRUE),
+(3, 'Contact', '<h3>Connect with us</h3>', 5, TRUE),
+
+-- Contact Page
+(4, 'Intro', '<h3>We would love to hear from you</h3>', 1, TRUE),
+(4, 'Contact Form', '<h3>Fill in your details to reach us</h3>', 2, TRUE);
