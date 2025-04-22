@@ -1,3 +1,4 @@
+
 use std::fs::File;
 use std::io::{Read, Write, Cursor};
 use zip::write::FileOptions;
@@ -90,3 +91,9 @@ pub fn zip_files_into_single_folder(
     zip.finish()?;
     Ok(buffer.into_inner())
 }
+
+
+
+Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+Content-Disposition: attachment; filename="report.xlsx"
+Content-Length: <size in bytes>
