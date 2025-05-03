@@ -1,0 +1,1423 @@
+# HTML
+
+1. HTML is the standard ____language for creating Web pages.
+
+- A) scripting  
+- B) programming  
+- C) styling  
+- D) markup
+
+Answer: D) markup
+
+2. Which is the correct syntax to include a comment in an HTML document?
+
+- A) //  
+- B) /*Comment*/  
+- C) // Comment //  
+- D) `<!-- Comment -->`
+
+Answer: D) `<!-- Comment -->`
+
+3. Can we hide content using the comment?
+
+- A) Yes  
+- B) No
+
+Answer: A) Yes
+
+4. Can we hide inline content using the comment?
+
+- A) Yes  
+- B) No
+
+Answer: A) Yes
+
+5. Which is the correct HTML statement to define the red color of the paragraph text?
+
+- A) `<p style="color: #ff0000;">`  
+- B) `<p style="color: red;">`  
+- C) Both A. and B.  
+- D) None of the above
+
+Answer: C) Both A. and B.
+
+6. Which is the correct HTML statement to display H2O in a paragraph?
+
+- A) `<p>`H`<sup>`2`</sup>`O`</p>`  
+- B) `<p>`H`<ins>`2`</ins>`O`</p>`  
+- C) `<p>`H`<below>`2`</below>`O`</p>`  
+- D) `<p>`H`<sub>`2`</sub>`O`</p>`
+
+Answer: D) `<p>`H`<sub>`2`</sub>`O`</p>`
+
+7. Which is the correct HTML statement to display HelloWorld in a paragraph?
+
+- A) `<p>`Hello`<sup>`World`</sup>`</p>`  
+- B) `<p>`Hello`<top>`World`</top>`</p>`  
+- C) `<p>`Hello`<sub>`World`</sub>`</p>`  
+- D) `<p>`Hello`<above>`World`</above>`</p>`
+
+Answer: A) `<p>`Hello`<sup>`World`</sup>`</p>`
+
+8. Which HTML tag is used to define a short quotation?
+
+- A) `<quotation>`  
+- B) `<quote>`  
+- C) `<qut>`  
+- D) `<q>`
+
+Answer: D) `<q>`
+
+9. Which HTML tag is used to define an abbreviation or an acronym?
+
+- A) `<abbreviation>`  
+- B) `<abbr>`  
+- C) `<acronym>`  
+- D) `<acr>`
+
+Answer: B) `<abbr>`
+
+10. Which attribute specifies the path to the image?
+
+- A) href  
+- B) link  
+- C) src  
+- D) All of the above
+
+Answer: C) src
+
+11.  Which attribute specifies an alternate text for the image?
+
+- A) alt  
+- B) alternate  
+- C) alttext  
+- D) All of the above
+
+Answer: B) alternate
+Explanation: The alternate attribute specifies an alternate text for the image.
+
+12. Each table cell is defined by a ____ tag.
+
+- A) `<cell>` ... `</cell>`  
+- B) `<tr>` ... `</tr>`  
+- C) `<th>` ... `</th>`  
+- D) `<td>` ... `</td>`
+
+Answer: D) `<td>` ... `</td>`
+Explanation: Each table cell is defined by the `<td>` and `</td>` tags.
+
+13. What is the purpose of the `<DOCTYPE>` declaration in HTML?
+        A) To specify the character encoding
+        B) To define the document type
+        C) To link external CSS
+        D) To add comments
+        Correct Answer: B) To define the document type
+        Type: Single Choice
+
+14. Which HTML tag is used to create a hyperlink?
+        A) `<link>`
+        B) `<a>`
+        C) `<anchor>`
+        D) `<href>`
+        Correct Answer: B) `<a>`
+        Type: Single Choice
+
+What is the difference between `<div>` and `<span>` tags in HTML?
+    A) `<div>`is inline, `<span>` is block-level
+    B) `<div>` is block-level, `<span>` is inline
+    C) Both are inline elements
+    D) Both are block-level elements
+    Correct Answer: B) `<div>` is block-level, `<span>` is inline
+    Type: Single Choice
+
+Which attribute is used to specify the source of an image in HTML?
+    A) src
+    B) href
+    C) title
+    D) alt
+    Correct Answer: A) src
+    Type: Single Choice
+
+What is the purpose of semantic HTML?
+    A) To improve page loading speed
+    B) To enhance SEO
+    C) To add visual styling
+    D) To provide better structure and meaning to content
+    Correct Answer: D) To provide better structure and meaning to content
+    Type: Single Choice
+
+Which HTML tag is used to create a dropdown list?
+    A) `<select>`
+    B) `<option>`
+    C) `<dropdown>`
+    D) `<list>`
+    Correct Answer: A) `<select>`
+    Type: Single Choice
+
+What is the purpose of the alt attribute in an image tag?
+    A) To provide a tooltip
+    B) To specify the image source
+    C) To describe the image for accessibility
+    D) To set the image width
+    Correct Answer: C) To describe the image for accessibility
+    Type: Single Choice
+
+Which HTML tag is used to create a table row?
+    A) `<tr>`
+    B) `<td>`
+    C) `<th>`
+    D) `<table>`
+    Correct Answer: A) `<tr>`
+    Type: Single Choice
+
+What is the purpose of the meta tag in HTML?
+    A) To add CSS styles
+    B) To provide metadata about the document
+    C) To create hyperlinks
+    D) To add JavaScript
+    Correct Answer: B) To provide metadata about the document
+    Type: Single Choice
+
+Which HTML tag is used to create a heading?
+    A) `<p>`
+    B) `<h1>`
+    C) `<span>`
+    D) `<div>`
+    Correct Answer: B) `<h1>`
+    Type: Single Choice
+
+What is the difference between `<ul>` and `<ol>` tags in HTML?
+    A) `<ul>` is ordered, `<ol>` is unordered
+    B) `<ul>` is unordered, `<ol>` is ordered
+    C) Both are used for tables
+    D) Both are used for images
+    Correct Answer: B) `<ul>` is unordered, `<ol>` is ordered
+    Type: Single Choice
+
+Which HTML tag is used to create a form?
+    A) `<form>`
+    B) `<input>`
+    C) `<submit>`
+    D) `<fieldset>`
+    Correct Answer: A) `<form>`
+    Type: Single Choice
+
+What is the purpose of the title attribute in HTML?
+    A) To specify the page title
+    B) To provide a tooltip
+    C) To add a comment
+    D) To specify the character encoding
+    Correct Answer: A) To specify the page title
+    Type: Single Choice
+
+Which HTML tag is used to create a paragraph?
+    A) `<p>`
+    B) `<para>`
+    C) `<text>`
+    D) `<content>`
+    Correct Answer: A) `<p>`
+    Type: Single Choice
+
+What is the purpose of the href attribute in HTML?
+    A) To specify the source of an image
+    B) To link to another webpage
+    C) To add a tooltip
+    D) To specify the character encoding
+    Correct Answer: B) To link to another webpage
+    Type: Single Choice
+
+Which HTML tag is used to create a table header?
+    A) `<th>`
+    B) `<td>`
+    C) `<tr>`
+    D) `<thead>`
+    Correct Answer: A) `<th>`
+    Type: Single Choice
+
+What is the purpose of the target attribute in HTML?
+    A) To specify where to open the linked document
+    B) To specify the source of an image
+    C) To add a tooltip
+    D) To specify the character encoding
+    Correct Answer: A) To specify where to open the linked document
+    Type: Single Choice
+
+Which HTML tag is used to create a list item?
+    A) `<li>`
+    B) `<ul>`
+    C) `<ol>`
+    D) `<dl>`
+    Correct Answer: A) `<li>`
+    Type: Single Choice
+
+What is the purpose of the rel attribute in HTML?
+    A) To specify the relationship between documents
+    B) To specify the source of an image
+    C) To add a tooltip
+    D) To specify the character encoding
+    Correct Answer: A) To specify the relationship between documents
+    Type: Single Choice
+
+Which HTML tag is used to create a table data cell?
+    A) `<td>`
+    B) `<th>`
+    C) `<tr>`
+    D) `<table>`
+    Correct Answer: A) `<td>`
+    Type: Single Choice
+
+# CSS
+
+1. **Why is the `font-weight` property used?**
+
+   - A) Sets how thick or thin characters in text should be displayed.
+   - B) Sets the size of the font.
+   - C) Both A. and B.
+   - D) None of the above.
+
+   **Answer:** A) Sets how thick or thin characters in text should be displayed.
+
+   **Explanation:**
+   The `font-weight` property sets how thick or thin characters in text should be displayed.
+
+---
+
+2. **To make text italic, which CSS property is used?**
+
+   - A) font
+   - B) font-family
+   - C) font-style
+   - D) All of the above
+
+   **Answer:** C) font-style
+
+   **Explanation:**
+   The `font-style` property is used to define the font style. To make the text italic, you use the `italic` value.
+   Example:
+
+   ```css
+   p {
+       font-style: italic;
+   }
+   ```
+
+---
+
+3. **What are the valid values of the `font-style` property?**
+
+   - A) italic, bold, bolder
+   - B) normal, bold, italic
+   - C) underline, bold, italic
+   - D) inherit, italic, normal, oblique
+
+   **Answer:** D) inherit, italic, normal, oblique
+
+   **Explanation:**
+   The valid values for the `font-style` property are:
+
+   - `inherit`
+   - `italic`
+   - `normal`
+   - `oblique`
+
+---
+
+4. **What is the use of `text-align: justify` in CSS?**
+
+   - A) Stretches the lines so that each line has equal width.
+   - B) Stretches the lines so that each line can be arranged in left alignment.
+   - C) Stretches the lines so that each line can be arranged in right alignment.
+   - D) None of the above.
+
+   **Answer:** A) Stretches the lines so that each line has equal width.
+
+   **Explanation:**
+   The `text-align: justify` property stretches the lines so that each line has equal width, except for the last line.
+
+---
+
+5. **Which CSS property is used to specify the indentation of the first line of a text?**
+
+   - A) text-align
+   - B) padding-left
+   - C) margin-left
+   - D) text-indent
+
+   **Answer:** D) text-indent
+
+   **Explanation:**
+   The `text-indent` property is used to specify the indentation of the first line of a text block.
+
+---
+
+6. **Which CSS property is used to specify the space between the words in a text?**
+
+   - A) word-spacing
+   - B) word-padding
+   - C) word-height
+   - D) characters-spacing
+
+   **Answer:** A) word-spacing
+
+   **Explanation:**
+   The `word-spacing` property is used to specify the space between words in a text.
+
+---
+
+7. **Which CSS property adds shadow to text?**
+
+   - A) content-shadow
+   - B) text-shadow
+   - C) word-shadow
+   - D) text-outline
+
+   **Answer:** B) text-shadow
+
+   **Explanation:**
+   The `text-shadow` property adds a shadow to the text. You can define the color, blur radius, and position of the shadow.
+
+---
+
+8. **What are the valid values of the `text-transform` property?**
+
+   - A) uppercase, lowercase, and capitalize
+   - B) uppercase, lowercase, capitalize, and sentence
+   - C) upper, lower, and capital
+   - D) upper, lower, capital, and sentence
+
+   **Answer:** A) uppercase, lowercase, and capitalize
+
+   **Explanation:**
+   The valid values for the `text-transform` property are:
+
+   - `uppercase`
+   - `lowercase`
+   - `capitalize`
+
+---
+
+9. **Which CSS function performs a calculation to be used as the property value?**
+
+   - A) sum()
+   - B) add()
+   - C) calc()
+   - D) addition()
+
+   **Answer:** C) calc()
+
+   **Explanation:**
+   The `calc()` function allows you to perform mathematical calculations directly in CSS. It is useful when you need dynamic layout adjustments.
+
+---
+
+10. **Can we link multiple stylesheets to a single page?**
+
+    - A) Yes
+    - B) No
+    - C) Can't say, it depends on CSS properties
+    - D) None of the above
+
+    **Answer:** A) Yes
+
+    **Explanation:**
+    Yes, you can link multiple stylesheets to a single page. You simply need to use multiple `<link>` elements in the `<head>` section.
+
+---
+
+11. **The \_\_\_ property is used in the positioning of the background image.**
+
+    - A) background-image
+    - B) background-position
+    - C) padding
+    - D) All of the above
+
+    **Answer:** B) background-position
+
+    **Explanation:**
+    The `background-position` property specifies the position of the background image within the element.
+
+---
+
+12. **Which line of code is a must to write to apply CSS Flexbox properties?**
+
+    - A) display: flex;
+    - B) display: flexbox;
+    - C) display: block;
+    - D) flex-direction: row;
+
+    **Answer:** A) display: flex;
+
+    **Explanation:**
+    To use Flexbox properties, you must first set `display: flex;` on the parent container. Then, you can use other Flexbox properties such as `flex-direction`, `justify-content`, and `align-items`.
+
+What is the purpose of the box-sizing property in CSS?
+        A) To specify the width and height of an element
+        B) To include padding and border in the total width and height
+        C) To set the font size
+        D) To set the margin
+        Correct Answer: B) To include padding and border in the total width and height
+        Type: Single Choice
+
+    Which CSS property is used to change the background color?
+        A) background-color
+        B) color
+        C) fill
+        D) paint
+        Correct Answer: A) background-color
+        Type: Single Choice
+
+    What is the purpose of the display property in CSS?
+        A) To specify how an element is displayed
+        B) To set the font size
+        C) To set the margin
+        D) To set the padding
+        Correct Answer: A) To specify how an element is displayed
+        Type: Single Choice
+
+    Which CSS property is used to add a border?
+        A) border
+        B) outline
+        C) padding
+        D) margin
+        Correct Answer: A) border
+        Type: Single Choice
+
+    What is the purpose of the float property in CSS?
+        A) To move an element to the left or right
+        B) To center an element
+        C) To set the font size
+        D) To set the margin
+        Correct Answer: A) To move an element to the left or right
+        Type: Single Choice
+
+    Which CSS property is used to set the font size?
+        A) font-size
+        B) text-size
+        C) size
+        D) font
+        Correct Answer: A) font-size
+        Type: Single Choice
+
+    What is the purpose of the position property in CSS?
+        A) To specify the positioning scheme
+        B) To set the font size
+        C) To set the margin
+        D) To set the padding
+        Correct Answer: A) To specify the positioning scheme
+        Type: Single Choice
+
+    Which CSS property is used to set the width of an element?
+        A) width
+        B) height
+        C) size
+        D) padding
+        Correct Answer: A) width
+        Type: Single Choice
+
+    What is the purpose of the margin property in CSS?
+        A) To set the space between elements
+        B) To set the font size
+        C) To set the padding
+        D) To set the border
+        Correct Answer: A) To set the space between elements
+        Type: Single Choice
+
+    Which CSS property is used to set the height of an element?
+        A) height
+        B) width
+        C) size
+        D) padding
+        Correct Answer: A) height
+        Type: Single Choice
+
+    What is the purpose of the padding property in CSS?
+        A) To set the space between the content and the border
+        B) To set the font size
+        C) To set the margin
+        D) To set the border
+        Correct Answer: A) To set the space between the content and the border
+        Type: Single Choice
+
+    Which CSS property is used to set the color of the text?
+        A) color
+        B) text-color
+        C) font-color
+        D) fill
+        Correct Answer: A) color
+        Type: Single Choice
+
+    What is the purpose of the border-radius property in CSS?
+        A) To add rounded corners to an element
+        B) To set the font size
+        C) To set the margin
+        D) To set the padding
+        Correct Answer: A) To add rounded corners to an element
+        Type: Single Choice
+
+    Which CSS property is used to set the opacity of an element?
+        A) opacity
+        B) transparency
+        C) alpha
+        D) visibility
+        Correct Answer: A) opacity
+        Type: Single Choice
+
+    What is the purpose of the font-family property in CSS?
+        A) To specify the font family
+        B) To set the font size
+        C) To set the text color
+        D) To set the text alignment
+        Correct Answer: A) To specify the font family
+        Type: Single Choice
+
+    Which CSS property is used to align text?
+        A) text-align
+        B) align-text
+        C) font-align
+        D) align
+        Correct Answer: A) text-align
+        Type: Single Choice
+
+    What is the purpose of the box-shadow property in CSS?
+        A) To add a shadow effect to an element
+        B) To set the font size
+        C) To set the margin
+        D) To set the padding
+        Correct Answer: A) To add a shadow effect to an element
+        Type: Single Choice
+
+    Which CSS property is used to set the cursor type?
+        A) cursor
+        B) pointer
+        C) mouse
+        D) hand
+        Correct Answer: A) cursor
+        Type: Single Choice
+
+    What is the purpose of the flex property in CSS?
+        A) To create flexible layouts
+        B) To set the font size
+        C) To set the margin
+        D) To set the padding
+        Correct Answer: A) To create flexible layouts
+        Type: Single Choice
+
+    Which CSS property is used to set the background image?
+        A) background-image
+        B) background
+        C) image
+        D) picture
+        Correct Answer: A) background-image
+        Type: Single Choice
+---
+
+# Python
+
+---
+
+**1. Amongst which of the following is/are the Numeric Types of Data Types?**
+
+- A) int
+- B) float
+- C) complex
+- D) All of the mentioned above
+
+**Answer:** D) All of the mentioned above
+
+**Explanation:**
+Python supports three numeric types: `int`, `float`, and `complex`.
+
+---
+
+**2. list, tuple, and range are the \_\_\_ of Data Types.**
+
+- A) Sequence Types
+- B) Binary Types
+- C) Boolean Types
+- D) None of the mentioned above
+
+**Answer:** A) Sequence Types
+
+**Explanation:**
+`list`, `tuple`, and `range` are sequence types in Python, used to store ordered collections of items.
+
+---
+
+**3. The `type()` function can be used to get the data type of any object.**
+
+- A) True
+- B) False
+
+**Answer:** A) True
+
+**Explanation:**
+The `type()` function in Python returns the type (or class) of an object.
+
+---
+
+**4. Amongst which of the following is/are the logical operators in Python?**
+
+- A) and
+- B) or
+- C) not
+- D) All of the mentioned above
+
+**Answer:** D) All of the mentioned above
+
+**Explanation:**
+`and`, `or`, and `not` are logical operators in Python, used to combine conditional statements.
+
+---
+
+**5. What is the name of the operator `**` in Python?**
+
+- A) Exponentiation
+- B) Modulus
+- C) Floor division
+- D) None of the mentioned above
+
+**Answer:** A) Exponentiation
+
+**Explanation:**
+The `**` operator is used to perform exponentiation in Python, raising a number to the power of another number.
+
+---
+
+**6. The `%` operator returns the \_\_\_?**
+
+- A) Quotient
+- B) Divisor
+- C) Remainder
+- D) None of the mentioned above
+
+**Answer:** C) Remainder
+
+**Explanation:**
+The `%` operator is used to get the remainder of the division of two numbers.
+
+---
+
+**7. Conditional statements are also known as \_\_\_ statements.**
+
+- A) Decision-making
+- B) Array
+- C) List
+- D) None of the mentioned above
+
+**Answer:** A) Decision-making
+
+**Explanation:**
+Conditional statements like `if`, `elif`, and `else` are decision-making statements in Python.
+
+---
+
+**8. Amongst which of the following if syntax is true?**
+
+- A)
+
+  ```python
+  if condition:
+      # Will execute this block if the condition is true
+  ```
+
+* B)
+
+  ```python
+  if condition
+  {
+      # Will execute this block if the condition is true
+  }
+  ```
+
+* C)
+
+  ```python
+  if(condition)
+      # Will execute this block if the condition is true
+  ```
+
+* D) None of the mentioned above
+
+**Answer:** A)
+
+```python
+if condition:
+    # Will execute this block if the condition is true
+```
+
+**Explanation:**
+Python uses indentation after `if condition:` to define the block of code that will execute if the condition is true.
+
+---
+
+**9. In Python, \_\_\_ defines a block of statements.**
+
+- A) Block
+- B) Loop
+- C) Indentation
+- D) None of the mentioned above
+
+**Answer:** C) Indentation
+
+**Explanation:**
+In Python, indentation is used to define blocks of code, especially for loops, conditionals, functions, and classes.
+
+---
+
+**10. In Python, the break and continue statements, together are called \_\_\_ statement.**
+
+- A) Jump
+- B) goto
+- C) compound
+- D) None of the mentioned above
+
+**Answer:** A) Jump
+
+**Explanation:**
+`break` and `continue` are used to control the flow of loops, often referred to as jump statements.
+
+---
+
+**11. What will be the output of the following Python code?**
+
+```python
+num = 10
+if num >` 0:
+    print("Positive number")
+elif num == 0:
+    print("Zero")
+else:
+    print("Negative number")
+```
+
+- A) Positive number
+- B) Negative number
+- C) Real number
+- D) None of the mentioned above
+
+**Answer:** A) Positive number
+
+**Explanation:**
+The variable `num` is 10, so the first condition `num >` 0` will be true, and the output will be "Positive number."
+
+---
+
+**12. With the break statement, can we stop the loop before it has looped through all the items?**
+
+- A) True
+- B) False
+
+**Answer:** A) True
+
+**Explanation:**
+The `break` statement is used to exit a loop prematurely.
+
+---
+
+**13. The \_\_\_ is a built-in function that returns a range object that consists of a series of integer numbers, which we can iterate using a for loop.**
+
+- A) range()
+- B) set()
+- C) dictionary{}
+- D) None of the mentioned above
+
+**Answer:** A) range()
+
+**Explanation:**
+The `range()` function generates a sequence of numbers, which is often used in `for` loops for iteration.
+
+---
+
+**14. Amongst which of the following is a function that does not have any name?**
+
+- A) Del function
+- B) Show function
+- C) Lambda function
+- D) None of the mentioned above
+
+**Answer:** C) Lambda function
+
+**Explanation:**
+A `lambda` function is an anonymous function, meaning it doesn't have a name.
+
+---
+
+**15. File handling in Python refers to the feature for reading data from the file and writing data into a file?**
+
+- A) True
+- B) False
+
+**Answer:** A) True
+
+**Explanation:**
+File handling allows you to read and write data to files using various built-in functions in Python.
+
+---
+
+**16. Amongst which of the following is/are the key functions used for file handling in Python?**
+
+- A) open() and close()
+- B) read() and write()
+- C) append()
+- D) All of the mentioned above
+
+**Answer:** D) All of the mentioned above
+
+**Explanation:**
+Python file handling uses functions like `open()`, `close()`, `read()`, `write()`, and `append()` to handle file operations.
+
+---
+
+**17. The seek() method is used to \_\_\_.**
+
+- A) Save the file in secondary storage
+- B) Position the file object at a particular position in a file
+- C) Delete the file from secondary storage
+- D) None of the mentioned above
+
+**Answer:** B) Position the file object at a particular position in a file
+
+**Explanation:**
+The `seek()` method is used to change the position of the file cursor, allowing you to read or write at specific positions in the file.
+
+- What is the purpose of the print() function in Python?
+    - A) To display output to the screen
+    - B) To get user input
+    - C) To perform calculations
+    - D) To store data
+    - Correct Answer: A) To display output to the screen
+    - Type: Single Choice
+    
+- Which Python operator is used to concatenate strings?
+    - A) +
+    - B) *
+    - C) /
+    - D) %
+    - Correct Answer: A) +
+    - Type: Single Choice
+
+- What is the purpose of the range() function in Python?
+    - A) To generate a sequence of numbers
+    - B) To create a list
+    - C) To create a dictionary
+    - D) To create a tuple
+    - Correct Answer: A) To generate a sequence of numbers
+    - Type: Single Choice
+
+- Which Python data type is used to store a collection of key-value pairs?
+    - A) list
+    - B) tuple
+    - C) dict
+    - D) set
+    - Correct Answer: C) dict
+    - Type: Single Choice
+
+- What is the purpose of the len() function in Python?
+    - A) To get the length of an object
+    - B) To get the type of an object
+    - C) To get the value of an object
+    - D) To get the keys of an object
+    - Correct Answer: A) To get the length of an object
+    - Type: Single Choice
+
+- Which Python operator is used to check for membership in a sequence?
+    - A) in
+    - B) is
+    - C) has
+    - D) contains
+    - Correct Answer: A) in
+    - Type: Single Choice
+
+- What is the purpose of the if statement in Python?
+    - A) To execute a block of code if a condition is true
+    - B) To execute a block of code repeatedly
+    - C) To skip a block of code
+    - D) To exit a program
+    - Correct Answer: A) To execute a block of code if a condition is true
+    - Type: Single Choice
+
+- Which Python function is used to convert a string to an integer?
+    - A) int()
+    - B) str()
+    - C) float()
+    - D) bool()
+    - Correct Answer: A) int()
+    - Type: Single Choice
+
+- What is the purpose of the for loop in Python?
+    - A) To execute a block of code repeatedly for a specified number of times
+    - B) To execute a block of code if a condition is true
+    - C) To skip a block of code
+    - D) To exit a program
+    - Correct Answer: A) To execute a block of code repeatedly for a specified number of times
+    - Type: Single Choice
+
+- Which Python operator is used to perform integer division?
+    - A) //
+    - B) /
+    - C) %
+    - D) *
+    - Correct Answer: A) //
+    - Type: Single Choice
+
+- What is the purpose of the import statement in Python?
+    - A) To import modules
+    - B) To create modules
+    - C) To execute modules
+    - D) To delete modules
+    - Correct Answer: A) To import modules
+    - Type: Single Choice
+
+- Which Python function is used to get the current working directory?
+    - A) os.getcwd()
+    - B) os.chdir()
+    - C) os.mkdir()
+    - D) os.rmdir()
+    - Correct Answer: A) os.getcwd()
+    - Type: Single Choice
+
+- What is the purpose of the try...except block in Python?
+    - A) To handle exceptions and errors
+    - B) To create a loop
+    - C) To create a conditional statement
+    - D) To create a function
+    - Correct Answer: A) To handle exceptions and errors
+    - Type: Single Choice
+
+- Which Python function is used to create a new directory?
+    - A) os.mkdir()
+    - B) os.chdir()
+    - C) os.rmdir()
+    - D) os.rename()
+    - Correct Answer: A) os.mkdir()
+    - Type: Single Choice
+
+- What is the purpose of the lambda function in Python?
+   -  A) To create a small anonymous function
+   -  B) To create a large function
+   -  C) To create a class
+   -  D) To create a module
+   -  Correct Answer: A) To create a small anonymous function
+   -  Type: Single Choice
+
+- Which Python function is used to remove an item from a list?
+    - A) remove()
+    - B) delete()
+    - C) pop()
+    - D) del
+    - Correct Answer: A) remove() and C) pop() and D) del (All are correct)
+    - Type: Multi Choice
+
+- What is the purpose of the with statement in Python?
+    - A) To simplify exception handling
+    - B) To create a context manager
+    - C) To open and close files properly
+    - D) All of the above
+    - Correct Answer: D) All of the above
+    - Type: Single Choice
+
+- Which Python function is used to get the keys of a dictionary?
+    - A) keys()
+    - B) values()
+    - C) items()
+    - D) get()
+    - Correct Answer: A) keys()
+    - Type: Single Choice
+
+- What is the purpose of the global keyword in Python?
+    - A) To declare a variable as global
+    - B) To declare a variable as local
+    - C) To declare a variable as static
+    - D) To declare a variable as constant
+    - Correct Answer: A) To declare a variable as global
+    - Type: Single Choice
+
+Which Python function is used to sort a list?
+    A) sort()
+    B) sorted()
+    C) arrange()
+    D) organize()
+    Correct Answer: A) sort() and B) sorted() (Both are correct)
+    Type: Multi Choice
+
+---
+
+# Java script
+
+**1.** Which of the following statement(s) is true about JavaScript?
+
+- It is a scripting language used to make the website interactive
+- It is an advanced version of Java for Desktop and Mobile application development
+- It is a markup language of Java to develop the webpages
+- All of the above
+
+**Answer:** A) It is a scripting language used to make the website interactive
+
+---
+
+**2.** JavaScript ignores?
+
+- newlines
+- tabs
+- spaces
+- All of the above
+
+**Answer:** D) All of the above
+
+---
+
+**3.** Which is the correct syntax to call an external JavaScript file in the current HTML document?
+
+- `<script src="jsfile.js">`</script>`
+- `<script href="jsfile.js">`</script>`
+- `<import src="jsfile.js">`</import>`
+- `<script link="jsfile.js">`</script>`
+
+**Answer:** A) `<script src="jsfile.js">`</script>`
+
+---
+
+**4.** Which JavaScript method is used to access an HTML element by id?
+
+- getElementById()
+- getElement(id)
+- getElementById(id)
+- elementById(id)
+
+**Answer:** C) getElementById(id)
+
+---
+
+**5.** In JavaScript, multi-line comments start with \_\_ and end with \_\_\_.
+
+- /\* and \*/
+- \`<!—and -->`
+- ## and
+
+* // and //
+
+**Answer:** A) /\* and \*/
+
+---
+
+**6.** How many keywords are there in JavaScript to declare variables or constants?
+
+- 1
+- 2
+- 3
+- 4
+
+**Answer:** C) 3
+
+---
+
+**7.** Which JavaScript operator is used to determine the type of a variable?
+
+- typeof
+- TypeOf
+- typeOf
+- sizeof
+
+**Answer:** A) typeof
+
+---
+
+**8.** Which keyword is used to define a JavaScript function?
+
+- module
+- fun
+- func
+- function
+
+**Answer:** D) function
+
+---
+
+**9.** Can we use a function as a variable value?
+
+- Yes
+- No
+
+**Answer:** A) Yes
+
+---
+
+**10.** Which is/are the valid JavaScript method(s) to extract string parts?
+
+- slice(start, end)
+- substring(start, end)
+- substr(start, length)
+- All of the above
+
+**Answer:** D) All of the above
+
+---
+
+**11.** What will be the output of the following JavaScript code?
+
+```javascript
+`<script>`
+    let x = "Hello, IncludeHelp!";
+    document.getElementById("test").innerHTML = x.slice(-13,-1);
+`</script>`
+```
+
+- IncludeHelp!
+- IncludeHelp
+- ValueError
+- Hello,
+
+**Answer:** B) IncludeHelp
+
+---
+
+**12.** In JavaScript, the string template literals use \_\_\_\_ rather than the quotes ("") to define a string?
+
+- Single quotes ('')
+- Backslash with single quote (\’')
+- Backslashes (\\)
+- Back-ticks (\`\`)
+
+**Answer:** D) Back-ticks (\`\`)
+
+---
+
+**13.** Which JavaScript method is used to get a number as a string?
+
+- toString()
+- intToString()
+- parseInteger()
+- All of the above
+
+**Answer:** A) toString()
+
+---
+
+**14.** What will be the output of the following JavaScript code?
+
+```javascript
+`<script>`
+    const myArray = ['h', 'e', 'l', 'l', 'o'];
+    document.write(myArray[0]);
+    document.write(myArray[1]);
+`</script>`
+```
+
+- he
+- undefinedh
+- ValueError
+- TypeError
+
+**Answer:** A) he
+
+---
+
+**15.** Which JavaScript method is used to call a function (a callback function) once for each array element?
+
+- for()
+- traverse()
+- forEach()
+- foreach()
+
+**Answer:** C) forEach()
+
+---
+
+**16.** Which JavaScript method is used to create a new array with array elements that passes a test?
+
+- forEach()
+- map()
+- forMap()
+- filter()
+
+**Answer:** D) filter()
+
+---
+
+**17.** What does the Date object's method getTime() return?
+
+- Date in DD-MM-YYYY format
+- Date in DD MON YYYY format
+- Date in MON, DD YYYY format
+- Number of milliseconds since January 1, 1970
+
+**Answer:** D) Number of milliseconds since January 1, 1970
+
+---
+
+**18.** What will be the output of the following JavaScript code?
+
+```javascript
+`<script>`
+    document.write(Math.round(107.5))
+`</script>`
+```
+
+- 107.5
+- 107
+- 108
+- 107.00
+
+**Answer:** C) 108
+
+JavaScript Questions
+
+- What is the purpose of the let keyword in JavaScript?
+    - A) To declare a constant variable
+    - B) To declare a block-scoped variable
+    - C) To declare a global variable
+    - D) To declare a function
+    - Correct Answer: B) To declare a block-scoped variable
+    - Type: Single Choice
+
+- Which JavaScript function is used to write to the console?
+    - A) console.log()
+    - B) print()
+    - C) write()
+    - D) output()
+    - Correct Answer: A) console.log()
+    - Type: Single Choice
+
+- What is the purpose of the typeof operator in JavaScript?
+    - A) To check the type of a variable
+    - B) To check if a variable is defined
+    - C) To check if a variable is null
+    - D) To check if a variable is undefined
+    - Correct Answer: A) To check the type of a variable
+    - Type: Single Choice
+
+- Which JavaScript method is used to get the length of a string?
+    - A) length()
+    - B) size()
+    - C) strlen()
+    - D) length
+    - Correct Answer: D) length
+    - Type: Single Choice
+
+- What is the purpose of the for...of loop in JavaScript?
+    - A) To iterate over the elements of an array
+    - B) To iterate over the properties of an object
+    - C) To iterate over the indices of an array
+    - D) To iterate over the keys of an object
+    - Correct Answer: A) To iterate over the elements of an array
+    - Type: Single Choice
+
+- Which JavaScript function is used to convert a string to uppercase?
+    - A) toUpperCase()
+    - B) upperCase()
+    - C) toUpper()
+    - D) upper()
+    - Correct Answer: A) toUpperCase()
+    - Type: Single Choice
+
+- What is the purpose of the arrow function in JavaScript?
+    - A) To create a function with a shorter syntax
+    - B) To create a function with more parameters
+    - C) To create a function with a different scope
+    - D) To create a function with more lines of code
+    - Correct Answer: A) To create a function with a shorter syntax
+    - Type: Single Choice
+
+- Which JavaScript method is used to sort an array?
+    - A) sort()
+    - B) arrange()
+    - C) order()
+    - D) organize()
+    - Correct Answer: A) sort()
+    - Type: Single Choice
+
+- What is the purpose of the nullish coalescing operator in JavaScript?
+    - A) To provide a default value if the operand is null or undefined
+    - B) To provide a default value if the operand is false
+    - C) To provide a default value if the operand is zero
+    - D) To provide a default value if the operand is empty string
+    - Correct Answer: A) To provide a default value if the operand is null or undefined
+    - Type: Single Choice
+
+- Which JavaScript function is used to parse a JSON string?
+    - A) JSON.parse()
+    - B) parseJSON()
+    - C) stringify()
+    - D) eval()
+    - Correct Answer: A) JSON.parse()
+    - Type: Single Choice
+
+- What is the purpose of the async keyword in JavaScript?
+    - A) To create an asynchronous function
+    - B) To create a synchronous function
+    - C) To create a generator function
+    - D) To create a callback function
+    - Correct Answer: A) To create an asynchronous function
+    - Type: Single Choice
+
+- Which JavaScript method is used to remove an element from the end of an array?
+    - A) pop()
+    - B) shift()
+    - C) splice()
+    - D) slice()
+    - Correct Answer: A) pop()
+    - Type: Single Choice
+
+- What is the purpose of the this keyword in JavaScript?
+    - A) To refer to the current object
+    - B) To refer to the global object
+    - C) To refer to the parent object
+    - D) To refer to the next object
+    - Correct Answer: A) To refer to the current object
+    - Type: Single Choice
+
+- Which JavaScript function is used to get the current date and time?
+    - A) new Date()
+    - B) now()
+    - C) currentTime()
+    - D) timestamp()
+    - Correct Answer: A) new Date()
+    - Type: Single Choice
+
+- What is the purpose of the try...catch statement in JavaScript?
+    - A) To handle exceptions and errors
+    - B) To create a loop
+    - C) To create a conditional statement
+    - D) To create a function
+    - Correct Answer: A) To handle exceptions and errors
+    - Type: Single Choice
+
+- Which JavaScript method is used to split a string into an array?
+    - A) split()
+    - B) split()
+    - C) divide()
+    - D) separate()
+    - Correct Answer: A) split()
+    - Type: Single Choice
+
+- What is the purpose of the Promise in JavaScript?
+    - A) To handle asynchronous operations
+    - B) To handle synchronous operations
+    - C) To handle errors
+    - D) To handle loops
+    - Correct Answer: A) To handle asynchronous operations
+    - Type: Single Choice
+
+- Which JavaScript function is used to check if a value is an array?
+    - A) Array.isArray()
+    - B) isArray()
+    - C) isArray()
+    - D) type()
+    - Correct Answer: A) Array.isArray()
+    - Type: Single Choice
+
+- What is the purpose of the default keyword in JavaScript?
+    - A) To specify the default value in a function parameter
+    - B) To specify the default case in a switch statement
+    - C) To specify the default value in an object
+    - D) To specify the default value in a variable declaration
+    - Correct Answer: A) To specify the default value in a function parameter
+    - Type: Single Choice
+
+- Which JavaScript method is used to find an element in an array?
+    - A) find()
+    - B) search()
+    - C) lookup()
+    - D) indexOf()
+    - Correct Answer: A) find() and D) indexOf() (Both are correct)
+    - Type: Multi Choice
