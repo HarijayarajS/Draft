@@ -30,3 +30,38 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     Ok(())
 }
+
+
+
+use tokio_postgres::{NoTls, Error};
+
+#[tokio::main]
+async fn main() -> Result<(), Error> {
+    // Connect to the database
+    let (client, mut connection) =
+        tokio_postgres::connect("host=localhost user=postgres password=postgres dbname=mydb", NoTls).await?;
+
+    // Listen to a channel named 'my_channel'
+    client.batch_execute("LISTEN my_channel").await?;
+
+    println!("Listening for notifications on 'my_channel'...");
+
+    // Continuously listen for notifications
+    while let Some(message) = connection.notifications().next().await {
+        match message {
+            Ok(notification) => {
+                println!(
+                    "Received notification: channel = {}, payload = {}",
+                    notification.channel(),
+                    notification.payload()
+                );
+            }
+            Err(e) => {
+                eprintln!("Error receiving notification: {}", e);
+                break;
+            }
+        }
+    }
+
+    Ok(())
+}
