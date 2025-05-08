@@ -104,3 +104,57 @@ async fn main() {
 }
 
 
+use futures::{stream, StreamExt};
+use tokio_postgres::{NoTls};
+use futures_channel::mpsc::unbounded;
+
+#[tokio::main]
+async fn main() {
+    // Connect to PostgreSQL
+    let (client, mut connection) =
+        tokio_postgres::connect("host=localhost user=postgres dbname=your_db_name", NoTls)
+            .await
+            .expect("Failed to connect");
+
+    // Start a task to poll for messages from the connection
+    let (tx, rx) = unbounded();
+    let stream = stream::poll_fn(move |cx| connection.poll_message(cx)).map(|msg| {
+        msg.map_err(|e| {
+            eprintln!("Connection error: {}", e);
+            std::process::exit(1);
+        })
+    });
+
+    let connection_task = stream.forward(tx).map(|r| {
+        if let Err(e) = r {
+            eprintln!("Stream forward error: {}", e);
+        }
+    });
+    tokio::spawn(connection_task);
+
+    // Listen for notifications
+    tokio::spawn({
+        let mut rx = rx;
+        async move {
+            while let Some(message) = rx.next().await {
+                if let tokio_postgres::AsyncMessage::Notification(n) = message {
+                    println!("Received notification: channel={}, payload={}", n.channel(), n.payload());
+                }
+            }
+        }
+    });
+
+    // Listen to a channel
+    client
+        .batch_execute("LISTEN test_notifications;")
+        .await
+        .expect("Failed to execute LISTEN");
+
+    println!("Listening for notifications on 'test_notifications'. Press Ctrl+C to exit.");
+
+    // Keep the main task alive
+    tokio::signal::ctrl_c()
+        .await
+        .expect("Failed to listen for Ctrl+C");
+    println!("Shutting down...");
+}
