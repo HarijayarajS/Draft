@@ -1,0 +1,97 @@
+Got it! You want a Rust Backend Developer version similar to the web developer one. Here’s a polished version:
+
+
+---
+
+About the Role
+
+We are seeking a skilled and motivated Rust Backend Developer to join our team. You will be responsible for designing, developing, and maintaining high-performance and secure backend services. You will collaborate closely with product managers, frontend developers, and other stakeholders to build scalable APIs and microservices that power our applications.
+
+
+---
+
+Key Responsibilities
+
+Design, develop, and maintain backend services, REST APIs, serverless functions, and microservices using Rust and other relevant technologies
+
+Collaborate with cross-functional teams to gather and prioritize project requirements
+
+Write clean, maintainable, and well-documented code following industry best practices
+
+Troubleshoot, debug, and resolve technical issues reported by QA or end-users
+
+Ensure backend systems are optimized for performance, scalability, and security
+
+Stay updated with the latest trends and advancements in backend development and Rust ecosystem
+
+
+
+---
+
+Required Qualifications
+
+Bachelor’s degree in Computer Science, Information Technology, or related field
+
+0–1 year of experience in backend development (internships are acceptable)
+
+Strong proficiency in Rust programming language
+
+Understanding of RESTful APIs, microservice architecture, and backend system design
+
+Familiarity with relational databases (e.g., PostgreSQL, MySQL) and ORMs
+
+Experience with version control systems like Git
+
+Strong problem-solving skills and attention to detail
+
+
+
+---
+
+Preferred Qualifications
+
+Familiarity with cloud platforms (AWS, GCP, Azure)
+
+Knowledge of containerization tools like Docker
+
+Understanding of CI/CD pipelines and DevOps principles
+
+Experience with asynchronous programming and message queues
+
+Familiarity with Agile development methodologies
+
+
+
+---
+
+Tools & Technologies Used
+
+Programming Languages: Rust
+
+Frameworks/Libraries: Axum, Actix-Web, SQLx, Tokio
+
+Databases: PostgreSQL, MySQL
+
+Version Control: Git
+
+Tools: Docker, Redis, CI/CD pipelines
+
+
+
+---
+
+Would you like me to also prepare:
+
+a more attractive version for freshers / junior developers
+
+a more professional version for experienced hires
+
+a version for your company website or job portal
+
+
+Tell me where you plan to post, I can fine-tune it accordingly.
+
+
+
+
+
