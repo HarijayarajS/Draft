@@ -1,0 +1,115 @@
+# Test Cases
+
+## 1. Pagination & Default Behavior
+
+-   **TC1.1: Invalid Page Number and Rows Per Page**
+    -   **Input:** `page_no: 0`, `rows_per_page: 0`
+    -   **Expected:** HTTP 200, `success: true`, `total_rows` reflecting all non-deleted/non-archived categories (8 in the example), `page_no: 1`, `rows_per_page: DEFAULT_GRID_ROWS_PER_PAGE`, `items` count appropriate for default page and rows. Should default to `created_on DESC` sort.
+-   **TC1.2: Valid Page Number and Rows Per Page**
+    -   **Input:** `page_no: 2`, `rows_per_page: 3`, `sort_key: "title"`, `sort_type: "asc"`
+    -   **Expected:** HTTP 200, `success: true`, `total_rows: 8`, `page_no: 2`, `rows_per_page: 3`, `items` count of 3, with categories sorted by title ascending (e.g., "Desserts", "Kids", "Main Courses").
+
+---
+
+## 2. Sorting
+
+-   **TC2.1: Sort by `no_products` Ascending**
+    -   **Input:** `sort_key: "no_products"`, `sort_type: "asc"`
+    -   **Expected:** HTTP 200, `success: true`, `items` sorted by `no_products` ascending (e.g., "Burger" (3 products), "Kids" (15 products)).
+-   **TC2.2: Sort by `title` Descending**
+    -   **Input:** `sort_key: "title"`, `sort_type: "desc"`
+    -   **Expected:** HTTP 200, `success: true`, `items` sorted by `title` descending (e.g., "Soups/Salads", "Sides").
+-   **TC2.3: Invalid Sort Key**
+    -   **Input:** `sort_key: "some"`, `sort_type: "asc"`
+    -   **Expected:** HTTP 200, `success: true`, `items` sorted by default `created_on DESC` (e.g., "Burger").
+
+---
+
+## 3. Filtering by Options
+
+-   **TC3.1: Filter by `is_archive: true`**
+    -   **Input:** `options.is_archive: true`
+    -   **Expected:** HTTP 200, `success: true`, `total_rows: 1`, `items` containing only archived categories (e.g., "Drank").
+-   **TC3.2: Filter by `is_deleted: true`**
+    -   **Input:** `options.is_deleted: true`
+    -   **Expected:** HTTP 200, `success: true`, `total_rows: 1`, `items` containing only deleted categories (e.g., "Grill").
+-   **TC3.3: Filter by Active Categories (`is_archive: false`, `is_deleted: false`)**
+    -   **Input:** `options.is_archive: false`, `options.is_deleted: false`, `sort_key: "title"`, `sort_type: "asc"`
+    -   **Expected:** HTTP 200, `success: true`, `total_rows: 8` (all active categories), `items` count of 8, none of which are archived or deleted.
+
+---
+
+## 4. Filtering by Dates (`created_on`)
+
+-   **TC4.1: Filter `created_on` From Date**
+    -   **Input:** `filters.created_on.from: 2025-01-20`
+    -   **Expected:** HTTP 200, `success: true`, `total_rows: 4`, `items` including categories created on or after 2025-01-20 (e.g., "Beverages").
+-   **TC4.2: Filter `created_on` To Date**
+    -   **Input:** `filters.created_on.to: 2025-01-18`
+    -   **Expected:** HTTP 200, `success: true`, `total_rows: 3`, `items` including categories created on or before 2025-01-18 (e.g., "Burger").
+-   **TC4.3: Filter `created_on` Date Range**
+    -   **Input:** `filters.created_on.from: 2025-01-19`, `filters.created_on.to: 2025-01-21`
+    -   **Expected:** HTTP 200, `success: true`, `total_rows: 3`, `items` including categories created within the specified range (e.g., "Desserts").
+
+---
+
+## 5. Filtering by `printer_ids`
+
+-   **TC5.1: Filter by Single Printer ID**
+    -   **Input:** `filters.printer_ids.values: ["printer_pastry"]`
+    -   **Expected:** HTTP 200, `success: true`, `total_rows: 1`, `items` containing only categories associated with "printer_pastry" (e.g., "Desserts").
+-   **TC5.2: Filter by Multiple Printer IDs**
+    -   **Input:** `filters.printer_ids.values: ["printer_kitchen", "printer_bar"]`, `sort_key: "title"`, `sort_type: "asc"`
+    -   **Expected:** HTTP 200, `success: true`, `total_rows: 6`, `items` containing categories associated with either printer, sorted by title (e.g., "Appetizers", "Beverages", "Kids", "Main Courses", "Sides", "Soups/Salads").
+
+---
+
+## 6. Filtering by `time_slot_id`
+
+-   **TC6.1: Filter by `time_slot_id`**
+    -   **Input:** `filters.time_slot_id.value: "ts_peak_hours"`
+    -   **Expected:** HTTP 200, `success: true`, `total_rows: 1`, `items` containing only categories associated with "ts_peak_hours" (e.g., "Main Courses").
+
+---
+
+## 7. Filtering by `no_products`
+
+-   **TC7.1: Filter `no_products` From Value**
+    -   **Input:** `filters.no_products.from: 40`, `sort_key: "no_products"`, `sort_type: "asc"`
+    -   **Expected:** HTTP 200, `success: true`, `total_rows: 2`, `items` including categories with 40 or more products (e.g., "Beverages", "Main Courses").
+-   **TC7.2: Filter `no_products` To Value**
+    -   **Input:** `filters.no_products.to: 25`, `sort_key: "no_products"`, `sort_type: "asc"`
+    -   **Expected:** HTTP 200, `success: true`, `total_rows: 4`, `items` including categories with 25 or fewer products (e.g., "Burger").
+-   **TC7.3: Filter `no_products` Range**
+    -   **Input:** `filters.no_products.from: 20`, `filters.no_products.to: 35`, `sort_key: "no_products"`, `sort_type: "asc"`
+    -   **Expected:** HTTP 200, `success: true`, `total_rows: 4`, `items` including categories within the specified product range (e.g., "Soups/Salads").
+
+---
+
+## 8. Filtering by Keyword
+
+-   **TC8.1: Filter by Matching Keyword**
+    -   **Input:** `keyword: "Desserts"`
+    -   **Expected:** HTTP 200, `success: true`, `total_rows: 1`, `items` containing only "Desserts".
+-   **TC8.2: Filter by Non-Matching Keyword**
+    -   **Input:** `keyword: "sample"`
+    -   **Expected:** HTTP 200, `success: true`, `total_rows: 0`, `items` count of 0, `page_no: 0`.
+
+---
+
+## 9. Combined Filters
+
+-   **TC9.1: Combined Filters and Options**
+    -   **Input:** `page_no: 1`, `rows_per_page: 10`, `sort_key: "title"`, `sort_type: "asc"`, `keyword: "KiDs"`, `filters.created_on: { from: 2025-01-20, to: 2025-01-23 }`, `filters.printer_ids: { values: ["printer_kitchen"] }`, `options.is_deleted: false`, `options.is_archive: false`
+    -   **Expected:** HTTP 200, `success: true`, `total_rows: 1`, `items` containing only "Kids".
+
+---
+
+## 10. Get Category by ID
+
+-   **TC10.1: Get Category by ID - Invalid Tokens**
+    -   **Input:** Invalid or missing authorization token.
+    -   **Expected:** HTTP 401 or 403 (depending on specific auth implementation), error response.
+-   **TC10.2: Get Category by ID - Valid Token and ID**
+    -   **Input:** Valid authorization token, `category_id: 6783a0876ac23c00080dc9b6`
+    -   **Expected:** HTTP 200, `success: true`, JSON response with detailed category information matching "Appetizers" (e.g., `company_id`, `title`, `icon`, `image`, `info`, `no_products`, `platforms`, `printers`, `sort_info`, `time_slot_id`, `user_tags`).
