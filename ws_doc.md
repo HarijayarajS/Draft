@@ -198,3 +198,182 @@ unsubscribe specific filters
 Wildcard matching (e.g., any category for company_id = 42)?
 
 
+
+
+
+
+Thanks for the clarification. Here's the updated and finalized version of the architecture:
+
+
+---
+
+✅ Updated Real-Time Grid Architecture (Simplified Payload)
+
+
+---
+
+🧠 Objective (Updated)
+
+The WebSocket server should:
+
+Accept a one-time subscription from the client with:
+
+company_id
+
+optional filters
+
+columns to track
+
+
+Use PostgreSQL LISTEN/NOTIFY for updates
+
+Send a minimal response to the client:
+
+Only the id of the changed row
+
+The event type: created, updated, or deleted
+
+
+No row data, just change signal.
+
+
+
+---
+
+📩 Client → Server (Subscription Message)
+
+{
+  "event": "subscribe",
+  "client_id": "abc-123",
+  "company_id": 5,
+  "filters": {
+    "status": "active"
+  },
+  "columns": ["price", "stock"]
+}
+
+
+---
+
+🔃 Server → Client (Update Message)
+
+{
+  "id": 42,
+  "event": "updated"
+}
+
+or
+
+{
+  "id": 73,
+  "event": "deleted"
+}
+
+or
+
+{
+  "id": 108,
+  "event": "created"
+}
+
+
+---
+
+📦 PostgreSQL Notification Payload Format
+
+Notification sent via pg_notify() like this:
+
+{
+  "id": 42,
+  "event": "updated",
+  "company_id": 5,
+  "changed_fields": ["price", "stock"]
+}
+
+Server will:
+
+Match company_id
+
+Match filters (e.g., status)
+
+Check if any subscribed columns are in changed_fields
+
+Then send: { "id": 42, "event": "updated" }
+
+
+
+---
+
+🧱 Updated Rust Types
+
+#[derive(Deserialize)]
+#[serde(tag = "event")]
+enum ClientMessage {
+    #[serde(rename = "subscribe")]
+    Subscribe(SubscribePayload),
+}
+
+#[derive(Deserialize)]
+struct SubscribePayload {
+    client_id: String,
+    company_id: i64,
+    filters: HashMap<String, String>,
+    columns: Vec<String>,
+}
+
+#[derive(Deserialize)]
+struct DbNotification {
+    id: i64,
+    event: String, // "created" | "updated" | "deleted"
+    company_id: i64,
+    changed_fields: Vec<String>,
+}
+
+#[derive(Serialize)]
+struct MinimalUpdate {
+    id: i64,
+    event: String,
+}
+
+
+---
+
+🔄 Workflow Recap
+
+Client  →  WS Connect  →  Send Subscribe Event (filters, columns)
+        ←  Waits
+
+PostgreSQL UPDATE
+   → Trigger → pg_notify(channel, {id, event, company_id, changed_fields})
+
+Server receives via LISTEN
+   → Filter (company_id, filters, fields)
+   → If matched → send {id, event} to WebSocket client
+
+
+---
+
+✅ Summary to Share with Manager
+
+> This solution enables a lightweight real-time dashboard with:
+
+Single WebSocket per client
+
+One-time subscription (company_id + filters + columns)
+
+PostgreSQL LISTEN/NOTIFY drives data changes
+
+Minimal client response: only { id, event }
+
+
+🔒 No large payloads sent, ensuring scalability to 20k+ clients.
+
+➕ Ready to proceed if approved.
+
+
+
+
+---
+
+Would you like this now in PDF format with architecture diagram and code blocks?
+
