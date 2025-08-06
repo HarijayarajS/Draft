@@ -1,0 +1,78 @@
+Here’s a clearer and well-structured version of your module and function documentation:
+
+
+---
+
+📁 Module: @apps/server-api/src/api/account.rs
+
+🔧 Function: get_account_options
+
+
+---
+
+🔽 Input:
+
+company_id: i32
+
+input: AccountOptionInput
+
+keyword: Option<String> – (optional) Filter accounts whose name matches the keyword (case-insensitive match or partial match).
+
+account_ids: Option<Vec<i64>> – (optional) Filter accounts whose doc_id is in the given list.
+
+
+
+
+---
+
+🔼 Output:
+
+Vec<OptionItemString>
+Each item contains:
+
+id: String → from doc_id
+
+title: String → from name
+
+
+
+Defined in: @apps/server-api/src/model/mod.rs
+
+
+---
+
+📄 Source Table:
+
+SQL Table: account
+Defined in: @db/table/0007_account.sql
+
+
+
+---
+
+📌 Function Description:
+
+This function fetches account options for a given company_id from the account table.
+It supports filtering based on:
+
+A search keyword that matches account names (name column).
+
+A list of account IDs (doc_id column).
+
+
+Filtering Logic:
+
+If both keyword and account_ids are provided → apply both filters.
+
+If only one is provided → apply the respective filter.
+
+If none is provided → return all accounts under the specified company_id.
+
+
+The result is returned as a vector of OptionItemString objects.
+
+
+---
+
+Let me know if you want the final function signature or example usage too.
+
