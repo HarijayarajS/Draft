@@ -1,0 +1,22 @@
+// MyTest.java
+public class MyTest {
+    // Function to test: sum of two integers
+    static int add(int a, int b) {
+        return a + b;
+    }
+
+    // Simple test helper
+    static void test(String name, int expected, int actual) {
+        if (expected == actual) {
+            System.out.println("[PASS] " + name);
+        } else {
+            System.out.println("[FAIL] " + name + " - expected " + expected + ", got " + actual);
+        }
+    }
+
+    public static void main(String[] args) {
+        test("Add positive numbers", 5, add(2, 3));
+        test("Add with zero", 7, add(7, 0));
+        test("Add negative number", -1, add(2, -3));
+    }
+}
