@@ -61,3 +61,44 @@ public class ArraySearch {
         System.out.println("\nSummary: " + passed + " Passed, " + failed + " Failed");
     }
 }
+
+
+
+// File: ArraySearchTest.java
+
+class ArraySearch {
+    public static int searchElement(int[] arr, int target) {
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] == target) {
+                return i;
+            }
+        }
+        return -1;
+    }
+}
+
+public class ArraySearchTest {
+    private static int passed = 0;
+    private static int failed = 0;
+
+    static void assertEquals(String testName, int expected, int actual) {
+        if (expected == actual) {
+            System.out.println("[PASS] " + testName);
+            passed++;
+        } else {
+            System.out.println("[FAIL] " + testName + " - expected: " + expected + ", got: " + actual);
+            failed++;
+        }
+    }
+
+    public static void main(String[] args) {
+        // Visible tests
+        assertEquals("Find middle element", 2, ArraySearch.searchElement(new int[]{10, 20, 30, 40, 50}, 30));
+        assertEquals("Not found", -1, ArraySearch.searchElement(new int[]{10, 20, 30, 40, 50}, 66));
+        assertEquals("First element", 0, ArraySearch.searchElement(new int[]{10, 20, 30, 40, 50}, 10));
+        assertEquals("Last element", 4, ArraySearch.searchElement(new int[]{10, 20, 30, 40, 50}, 50));
+        assertEquals("Empty array", -1, ArraySearch.searchElement(new int[]{}, 19));
+
+        System.out.println("\nSummary: " + passed + " Passed, " + failed + " Failed");
+    }
+}
