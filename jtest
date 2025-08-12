@@ -20,3 +20,44 @@ public class MyTest {
         test("Add negative number", -1, add(2, -3));
     }
 }
+
+
+
+public class ArraySearch {
+
+    public static int searchElement(int[] arr, int target) {
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] == target) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static void main(String[] args) {
+        int passed = 0;
+        int failed = 0;
+
+        if (searchElement(new int[]{10, 20, 30, 40, 50}, 30) == 2) {
+            System.out.println("Test 1 Passed"); passed++;
+        } else { System.out.println("Test 1 Failed"); failed++; }
+
+        if (searchElement(new int[]{10, 20, 30, 40, 50}, 66) == -1) {
+            System.out.println("Test 2 Passed"); passed++;
+        } else { System.out.println("Test 2 Failed"); failed++; }
+
+        if (searchElement(new int[]{10, 20, 30, 40, 50}, 10) == 0) {
+            System.out.println("Test 3 Passed"); passed++;
+        } else { System.out.println("Test 3 Failed"); failed++; }
+
+        if (searchElement(new int[]{10, 20, 30, 40, 50}, 50) == 4) {
+            System.out.println("Test 4 Passed"); passed++;
+        } else { System.out.println("Test 4 Failed"); failed++; }
+
+        if (searchElement(new int[]{}, 19) == -1) {
+            System.out.println("Test 5 Passed"); passed++;
+        } else { System.out.println("Test 5 Failed"); failed++; }
+
+        System.out.println("\nSummary: " + passed + " Passed, " + failed + " Failed");
+    }
+}
