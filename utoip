@@ -1,0 +1,30 @@
+use utoipa::openapi::{Modify, OpenApi};
+
+struct SecurityAddon;
+
+impl Modify for SecurityAddon {
+    fn modify(&self, openapi: &mut OpenApi) {
+        // Add global security scheme
+        if let Some(components) = openapi.components.as_mut() {
+            components.add_security_scheme(
+                "AUTHORIZATION",
+                utoipa::openapi::security::SecurityScheme::Http(
+                    utoipa::openapi::security::Http::new(
+                        utoipa::openapi::security::HttpAuthScheme::Bearer,
+                    ),
+                ),
+            );
+        }
+
+        // Now selectively remove security for some paths
+        if let Some(paths) = openapi.paths.paths.iter_mut().next() {
+            for (url, item) in &mut openapi.paths.paths {
+                if url.starts_with("/public") {
+                    if let Some(op) = item.get.as_mut() {
+                        op.security = Some(vec![]); // 👈 disables security
+                    }
+                }
+            }
+        }
+    }
+}
