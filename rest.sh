@@ -70,3 +70,34 @@ ALTER USER $DB_USER CREATEDB CREATEROLE LOGIN;
 EOF
 
 echo "✅ Database '$DB_NAME' initialized with user '$DB_USER' (collation = C)."
+
+
+
+
+
+
+#!/bin/sh
+# Replacement for `sqlx db reset` that enforces C collation
+
+DB_NAME="spont"          # database name
+DB_USER="postgres"       # superuser (or adjust)
+DB_HOST="localhost"      # adjust if needed
+DB_PORT="5432"
+
+DATABASE_URL="postgres://${DB_USER}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
+
+echo "🗑️ Dropping database: $DB_NAME"
+dropdb -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" --if-exists "$DB_NAME"
+
+echo "📦 Creating database with C collation..."
+createdb \
+  --locale=C \
+  --encoding=UTF8 \
+  --template=template0 \
+  -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" \
+  "$DB_NAME"
+
+echo "🚀 Running migrations..."
+sqlx migrate run --database-url "$DATABASE_URL"
+
+echo "✅ Database '$DB_NAME' reset with C collation."
