@@ -1,3 +1,13 @@
+INSERT INTO setting (company_id, doc_id)
+SELECT c.id, substr(encode(gen_random_bytes(12), 'hex'), 1, 24)  -- 12 bytes = 24 hex chars
+FROM company c
+LEFT JOIN setting s ON c.id = s.company_id
+WHERE s.company_id IS NULL;
+
+
+
+
+
 CRINSERT INTO customer (name, mobile, email, company, address, description, tags, is_archive)
 VALUES 
     ('John Doe', '1234567890', 'john.doe@example.com', 'ABC Company', '123 Main St, City A, Country X', 'Regular customer', 'regular, important', false),
