@@ -1,0 +1,52 @@
+use axum::{Json, Router, routing::post};
+use serde::{Deserialize, Serialize};
+use utoipa::{OpenApi, ToSchema};
+use utoipa_axum::router::OpenApiRouter;
+
+/// Example request type
+#[derive(Deserialize, ToSchema)]
+struct ProductRequest {
+    category: String,
+}
+
+/// Example response type
+#[derive(Serialize, ToSchema)]
+struct ProductResponse {
+    id: i32,
+    name: String,
+}
+
+/// Your handler for `/products/list`
+async fn handler_get_list(Json(req): Json<ProductRequest>) -> Json<Vec<ProductResponse>> {
+    println!("Got category = {}", req.category);
+
+    Json(vec![
+        ProductResponse { id: 1, name: "Item A".into() },
+        ProductResponse { id: 2, name: "Item B".into() },
+    ])
+}
+
+/// OpenAPI spec
+#[derive(OpenApi)]
+#[openapi(
+    components(schemas(ProductRequest, ProductResponse)),
+    // You don't need to repeat the path here — utoipa-axum maps it from the Router
+)]
+struct ApiDoc;
+
+#[tokio::main]
+async fn main() {
+    let app = OpenApiRouter::with_openapi(ApiDoc::openapi())
+        .routes(|router| {
+            router.route("/products/list", post(handler_get_list))
+        })
+        // serve the JSON spec at /api-docs/openapi.json
+        .route("/api-docs/openapi.json", post(|| async { "spec here" }));
+
+    println!("Server running at http://localhost:3000");
+
+    axum::Server::bind(&"0.0.0.0:3000".parse().unwrap())
+        .serve(app.into_make_service())
+        .await
+        .unwrap();
+}
