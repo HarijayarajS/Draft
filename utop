@@ -50,3 +50,19 @@ async fn main() {
         .await
         .unwrap();
 }
+
+
+
+
+[package]
+name = "server-api"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+axum = "0.7"
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+utoipa = "5"
+utoipa-axum = "0.1"
+
