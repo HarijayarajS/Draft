@@ -69,3 +69,48 @@ utoipa-axum = "0.1"
 
 
 
+
+
+
+use axum::{Router, routing::post};
+use utoipa::OpenApi;
+use utoipa_axum::{router::OpenApiRouter, routes};
+
+mod product;
+
+#[derive(OpenApi)]
+#[openapi(
+    // No need to duplicate paths here if using the `routes!` macro
+    components(schemas(
+        product::ProductRequest,
+        product::ProductResponse,
+        product::ProductCreate,
+        product::ProductCreateResponse
+    ))
+)]
+struct ApiDoc;
+
+#[tokio::main]
+async fn main() {
+    // Build the OpenApiRouter and split into router + spec
+    let (axum_router, openapi_spec) = OpenApiRouter::new()
+        .routes(routes!(
+            product::handler_get_list,
+            product::handler_create
+        ))
+        .split_for_parts();
+
+    // Merge with yourself-defined routes or expose API doc
+    let app = axum_router
+        .route("/api-docs/openapi.json", post(move || async move {
+            axum::Json(openapi_spec.clone())
+        }));
+
+    println!("Server running at http://localhost:3000");
+
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")
+        .await
+        .unwrap();
+
+    axum::serve(listener, app).await.unwrap();
+}
