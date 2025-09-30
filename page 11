@@ -1,0 +1,131 @@
+
+# Page 11: Building a Reusable Database Layer / Abstraction
+
+## Introduction
+When working on real-world applications, directly scattering database calls across your codebase can lead to duplication, inconsistency, and maintenance >
+
+Think of this as building your own lightweight ORM (Object Relational Mapper), tailored to your project’s needs.
+
+## Syntax / Core Idea
+The idea is to wrap `tokio-postgres` logic inside dedicated structs and functions that represent repositories or services.
+
+```rust
+pub struct UserRepository {
+    pool: deadpool_postgres::Pool,
+}
+
+impl UserRepository {
+    pub fn new(pool: deadpool_postgres::Pool) -> Self {
+        Self { pool }
+    }
+
+    pub async fn get_user_by_id(&self, id: i32) -> Result<Option<User>, tokio_postgres::Error> {
+        let client = self.pool.get().await?;
+        let row = client.query_opt("SELECT id, name FROM users WHERE id = $1", &[&id]).await?;
+        Ok(row.map(|r| User { id: r.get(0), name: r.get(1) }))
+    }
+}
+```
+
+## Full Real-World Examples
+
+### Example 1: Central Repository Pattern
+```rust
+// User entity
+#[derive(Debug)]
+pub struct User {
+    pub id: i32,
+    pub name: String,
+}
+
+// User repository
+pub struct UserRepository {
+    pool: deadpool_postgres::Pool,
+}
+
+impl UserRepository {
+    pub fn new(pool: deadpool_postgres::Pool) -> Self {
+        Self { pool }
+    }
+
+    pub async fn get_all_users(&self) -> Result<Vec<User>, tokio_postgres::Error> {
+        let client = self.pool.get().await?;
+        let rows = client.query("SELECT id, name FROM users", &[]).await?;
+        Ok(rows.into_iter().map(|r| User { id: r.get(0), name: r.get(1) }).collect())
+    }
+}
+```
+
+### Example 2: Insert User via Abstraction
+```rust
+impl UserRepository {
+    pub async fn create_user(&self, name: &str) -> Result<User, tokio_postgres::Error> {
+        let client = self.pool.get().await?;
+        let row = client.query_one(
+            "INSERT INTO users (name) VALUES ($1) RETURNING id, name",
+            &[&name],
+        ).await?;
+        Ok(User { id: row.get(0), name: row.get(1) })
+    }
+}
+```
+
+### Example 3: Update User
+```rust
+impl UserRepository {
+    pub async fn update_user(&self, id: i32, new_name: &str) -> Result<u64, tokio_postgres::Error> {
+        let client = self.pool.get().await?;
+        let affected = client.execute(
+            "UPDATE users SET name = $1 WHERE id = $2",
+            &[&new_name, &id],
+        ).await?;
+        Ok(affected)
+    }
+}
+```
+
+### Example 4: Delete User
+```rust
+impl UserRepository {
+    pub async fn delete_user(&self, id: i32) -> Result<u64, tokio_postgres::Error> {
+        let client = self.pool.get().await?;
+        let affected = client.execute("DELETE FROM users WHERE id = $1", &[&id]).await?;
+        Ok(affected)
+    }
+}
+```
+
+### Example 5: Service Layer Using Repository
+```rust
+pub struct UserService {
+    repo: UserRepository,
+}
+
+impl UserService {
+    pub fn new(repo: UserRepository) -> Self {
+        Self { repo }
+    }
+
+    pub async fn register_user(&self, name: &str) -> Result<User, tokio_postgres::Error> {
+        self.repo.create_user(name).await
+    }
+
+    pub async fn list_users(&self) -> Result<Vec<User>, tokio_postgres::Error> {
+        self.repo.get_all_users().await
+    }
+}
+```
+
+## Best Practices & Tips
+- **Centralize queries** inside repositories, never scatter SQL across business logic.
+- **Use traits** for mocking repositories during tests.
+- **Keep SQL readable**: multiline queries improve maintainability.
+- **Encapsulate transactions** in service methods when multiple queries must be atomic.
+- **Avoid over-abstraction**: keep it simple until your project’s scale requires complexity.
+
+## Assignments (Practice)
+1. Create a `ProductRepository` with CRUD operations for products.
+2. Add a `find_by_name` method in `UserRepository`.
+3. Implement a `UserService` method to delete multiple users by IDs.
+4. Add transaction support inside the service (create user + insert audit log).
+5. Mock the `UserRepository` trait for testing purposes.
