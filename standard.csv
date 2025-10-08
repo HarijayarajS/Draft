@@ -1,0 +1,3 @@
+id,title,attributes,calorie_count,categories,color,dietary_options,has_alcohol,info,ingredients,kitchen_display_name,pos_display_name,report_category_id,unit_base,unit_system,venue_ids
+"prod-001","Veg Sandwich","[""gluten-free"",""dairy-free""]",220,"cat-101","#FDA00B","[""eggs"",""nuts"",""soy""]",false,"Healthy veg sandwich","[""bread"",""lettuce"",""tomato""]","Kitchen Veg","POS Veg","rep-201","piece","metric","[""venue-1"",""venue-2""]"
+"prod-002","Chicken Burger","[""high-protein""]",340,"cat-102","#E45C3A","[""meat"",""soy""]",false,"Grilled chicken burger","[""bun"",""chicken"",""cheese""]","Kitchen Non-Veg","POS Non-Veg","rep-202","piece","imperial","[""venue-3""]"
