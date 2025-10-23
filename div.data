@@ -1,87 +1,287 @@
--- ===========================
---  Devices for test-org-1
--- ===========================
 INSERT INTO device (
     doc_id, org_id, venue_id, app_version, avoid_redundant_bt, disable_peer_bt,
     field_x_device_id, is_active, is_debug_logs_enabled, is_print_server,
     name, prefix_code, serial_number, sync_group_no, type, uuid,
     hardware, os_name, os_version, is_linked, doc
 ) VALUES
--- 1. Kitchen Printer
+-- ============ test-org-1 / test-venue-1 (10 devices) ============
 ('dev-printer-1', 'test-org-1', 'test-venue-1', 'v1.0.3', false, false,
  'PRN001', true, false, false, 'Kitchen Printer 1', 'KP1', 'SN-PRN-1001', 1, 'printer', gen_random_uuid()::text,
- 'Epson TM-T88', 'Linux', '1.0', false, 
- '{"printer":{"model":"Epson TM-T88","ip_address":"192.168.0.101","no_copies":1,"is_cash_drawer":true},"network_type":"ethernet"}'::jsonb),
+ 'Epson TM-T88', 'Linux', '1.0', false,
+ '{
+   "printer": {
+      "backupPrinterId": "printer-2",
+      "excludedSlots": ["bar", "takeaway"],
+      "excluded": ["orders"],
+      "fontSize": "medium",
+      "groupBy": "category",
+      "hasReceiptPrinter": true,
+      "ipAddressType": "ipv4",
+      "ipAddress": "192.168.0.101",
+      "isActiveEnabled": true,
+      "isBackupPrinter": false,
+      "isBuzzer": false,
+      "isCashDrawer": true,
+      "model": "Epson TM-T88",
+      "noCopies": 1,
+      "noProductionPrint": 0,
+      "printFooter": "Thank you for visiting!",
+      "printHeader": "Test Restaurant",
+      "printerType": "kitchen",
+      "productionAttributeType": "normal",
+      "receiptAttributeType": "standard",
+      "receiptOptions": ["header", "footer"],
+      "spotifyHeader": "",
+      "spotifyImage": ""
+   },
+   "networkType": "ethernet",
+   "androidGo": null,
+   "androidTerminal": null,
+   "batteryLevel": 97.5,
+   "batteryState": "charging",
+   "cashdro": null,
+   "cashierGo": null,
+   "digitalMenu": null,
+   "hub": null,
+   "kiosk": null,
+   "kitchen": null,
+   "pin": null,
+   "printServer": null,
+   "progress": null
+}'::jsonb),
 
--- 2. Billing Android Terminal
 ('dev-android-terminal-1', 'test-org-1', 'test-venue-1', 'v2.0.1', false, false,
  'ANDTERM001', true, false, false, 'Billing Terminal 1', 'BT1', 'SN-ANDTERM-2001', 1, 'android_terminal', gen_random_uuid()::text,
  'Sunmi V2 Pro', 'Android', '12', false,
- '{"android_terminal":{"language":"en","has_receipt_printer":true,"payment_provider":"stripe"},"network_type":"wifi"}'::jsonb),
+ '{
+   "androidTerminal": {
+      "canShowReceiptQr": true,
+      "companyLogo": "logo.png",
+      "hasReceiptPrinter": true,
+      "isLeatEnabled": false,
+      "language": "en",
+      "paymentProvider": "stripe",
+      "readNfcCard": "supported",
+      "secondaryProvider": "paypal",
+      "tipType": "manual",
+      "tips": [{"isAutoSet": true, "tip": 5.0}],
+      "useForPayments": true,
+      "waitingScreen": "default"
+   },
+   "networkType": "wifi",
+   "batteryLevel": 85.4,
+   "batteryState": "normal",
+   "cashdro": null,
+   "cashierGo": null,
+   "printer": null,
+   "hub": null,
+   "kiosk": null,
+   "kitchen": null,
+   "pin": null,
+   "printServer": null,
+   "progress": null
+}'::jsonb),
 
--- 3. Cash Drawer
 ('dev-cashdro-1', 'test-org-1', 'test-venue-1', 'v1.5.2', false, false,
  'CASH001', true, false, false, 'Cash Drawer 1', 'CD1', 'SN-CASH-3001', 1, 'cashdro', gen_random_uuid()::text,
  'CashDro 5', 'Linux', '2.1', false,
- '{"cashdro":{"ip_address":"192.168.0.103","protocol":"tcp","user_name":"admin"},"network_type":"ethernet"}'::jsonb),
+ '{
+   "cashdro": {
+      "ipAddress": "192.168.0.103",
+      "password": "admin123",
+      "protocol": "tcp",
+      "userName": "cash_admin"
+   },
+   "networkType": "ethernet",
+   "batteryLevel": 100.0,
+   "batteryState": "plugged",
+   "printer": null,
+   "kitchen": null,
+   "pin": null,
+   "hub": null,
+   "cashierGo": null
+}'::jsonb),
 
--- 4. Kiosk Device
 ('dev-kiosk-1', 'test-org-1', 'test-venue-1', 'v1.3.1', false, false,
  'KSK001', true, false, false, 'Self-Order Kiosk 1', 'KSK1', 'SN-KSK-4001', 1, 'kiosk', gen_random_uuid()::text,
  'KioskPro X', 'Android', '11', false,
- '{"kiosk":{"can_show_receipt_qr":true,"color":"black","payment_option":"card"},"network_type":"wifi"}'::jsonb),
+ '{
+   "kiosk": {
+      "androidTerminalId": "android-term-1",
+      "canShowReceiptQr": true,
+      "cashdroId": "cashdro-1",
+      "categoryStyle": "grid",
+      "color": "black",
+      "hasBarcode": true,
+      "hiddenCategories": ["staff"],
+      "hiddenPayments": ["wallet"],
+      "isLeatEnabled": false,
+      "isLinkBooking": false,
+      "locationId": "loc-001",
+      "options": "default",
+      "paymentOption": "card",
+      "printerId": "printer-1",
+      "progressScreenIds": ["progress-1"],
+      "tableId": "table-001",
+      "terminalId": "term-001",
+      "useProgressScreen": true
+   },
+   "networkType": "wifi",
+   "batteryLevel": 88.0,
+   "batteryState": "charging"
+}'::jsonb),
 
--- 5. Digital Menu Display
 ('dev-dmenu-1', 'test-org-1', 'test-venue-1', 'v1.0.0', false, false,
  'DM001', true, false, false, 'Digital Menu 1', 'DM1', 'SN-DM-5001', 1, 'digital_menu', gen_random_uuid()::text,
  'LG Display 24"', 'Android', '10', false,
- '{"digital_menu":{"theme":"dark","no_rows":3,"product_display_type":"grid"},"network_type":"wifi"}'::jsonb),
+ '{
+   "digitalMenu": {
+      "backgroundColor": "#ffffff",
+      "backgroundImage": ["bg1.png"],
+      "companyImageUrl": "logo.png",
+      "companyImage": "logo.png",
+      "fontColor": "#000000",
+      "fontName": "Roboto",
+      "fontSize": "14px",
+      "groups": [
+         {"groupId":"grp1","isActive":true,"products":[{"content":"Pizza","height":1.0,"id":"prod1","imageUrl":"pizza.png","image":"pizza.png","isActive":true,"type":"food","priceIncl":299.0,"productId":"P001","sortNo":1,"title":"Pizza Margherita"}],"rowNo":1,"sortNo":1,"title":"Main Course"}
+      ],
+      "isAdvFullScreen": false,
+      "isProgressVisible": true,
+      "mode": "landscape",
+      "noRows": 3,
+      "productDisplayType": "grid",
+      "rotation": 0,
+      "theme": "light"
+   },
+   "networkType": "wifi",
+   "batteryLevel": 90.0,
+   "batteryState": "normal"
+}'::jsonb),
 
--- 6. Kitchen Display
 ('dev-kitchen-1', 'test-org-1', 'test-venue-1', 'v1.7.0', false, false,
  'KIT001', true, false, false, 'Kitchen Display 1', 'KD1', 'SN-KITCH-6001', 1, 'kitchen', gen_random_uuid()::text,
  'Dell Monitor', 'Linux', '1.0', false,
- '{"kitchen":{"always_open":true,"is_chef":true,"font_size":"medium"},"network_type":"ethernet"}'::jsonb),
+ '{
+   "kitchen": {
+      "alwaysOpen": true,
+      "autoCompleteIn": 15,
+      "canStartManually": true,
+      "excludedSlots": [],
+      "excluded": [],
+      "fontSize": "large",
+      "groupBy": "category",
+      "isChef": true,
+      "isExcludeOtherScreen": false,
+      "keepServed": true,
+      "type": "display",
+      "modelType": "touch",
+      "monitorId": "monitor-1",
+      "monitorIds": ["m1","m2"],
+      "newOrderSoundOn": true,
+      "noColumns": "3",
+      "noRows": 2,
+      "preparationTime": 5.0,
+      "printers": ["printer-1"],
+      "receiptAttributeType": "normal",
+      "showOtherOrders": true,
+      "showPlannedReceipts": false,
+      "showServeStep": true,
+      "showSpyScreen": false
+   },
+   "networkType": "ethernet",
+   "batteryLevel": 100.0,
+   "batteryState": "plugged"
+}'::jsonb),
 
--- 7. Print Server
 ('dev-printserver-1', 'test-org-1', 'test-venue-1', 'v1.2.0', false, false,
  'PS001', true, false, true, 'Print Server 1', 'PS1', 'SN-PS-7001', 1, 'print_server', gen_random_uuid()::text,
  'Raspberry Pi 4', 'Linux', '2.0', false,
- '{"print_server":{"host":"192.168.0.110","wifi_ssid":"POS_WIFI","mode":"auto"},"network_type":"ethernet"}'::jsonb),
+ '{
+   "printServer": {
+      "mode": "auto",
+      "host": "192.168.0.110",
+      "wifiSsid": "POS_WIFI",
+      "wifiPassword": "12345678",
+      "wifiSecurity": "WPA2",
+      "deviceType": "server"
+   },
+   "networkType": "ethernet",
+   "batteryLevel": 100.0,
+   "batteryState": "plugged"
+}'::jsonb),
 
--- 8. Android Go Terminal
 ('dev-androidgo-1', 'test-org-1', 'test-venue-1', 'v3.1.0', false, false,
  'ANDGO001', true, false, false, 'Android Go 1', 'AG1', 'SN-AG-8001', 1, 'android_go', gen_random_uuid()::text,
  'Sunmi T2', 'Android', '13', false,
- '{"android_go":{"has_receipt_printer":true,"tip_type":"manual"},"network_type":"wifi"}'::jsonb),
+ '{
+   "androidGo": {
+      "categoryStyle": "list",
+      "hardware": "Sunmi T2",
+      "hasReceiptPrinter": true,
+      "hiddenCategories": ["bar"],
+      "hiddenPayments": ["cash"],
+      "hiddenSlots": ["slot1"],
+      "isDialPadHidden": false,
+      "isHideToProduction": false,
+      "isLowBatteryMode": false,
+      "paymentProvider": "razorpay",
+      "printerId": "printer-2",
+      "progressScreenIds": ["progress-2"],
+      "startCategoryId": "cat-1",
+      "startSlot": "slot-1",
+      "tipType": "manual",
+      "tips": [{"isAutoSet":false,"tip":3.0}],
+      "useProgressScreen": true
+   },
+   "networkType": "wifi",
+   "batteryLevel": 70.0,
+   "batteryState": "normal"
+}'::jsonb),
 
--- 9. Progress Screen
 ('dev-progress-1', 'test-org-1', 'test-venue-1', 'v1.1.5', false, false,
  'PRG001', true, false, false, 'Progress Display 1', 'PG1', 'SN-PG-9001', 1, 'progress', gen_random_uuid()::text,
  'ViewSonic 27"', 'Android', '9', false,
- '{"progress":{"theme":"dark","font_size":"large"},"network_type":"wifi"}'::jsonb),
+ '{
+   "progress": {
+      "fontSize": "large",
+      "isAdvFullScreen": false,
+      "mode": "landscape",
+      "theme": "dark"
+   },
+   "networkType": "wifi",
+   "batteryLevel": 95.0,
+   "batteryState": "normal"
+}'::jsonb),
 
--- 10. Hub Controller
 ('dev-hub-1', 'test-org-1', 'test-venue-1', 'v2.0.5', false, false,
  'HUB001', true, false, false, 'Hub Controller 1', 'HB1', 'SN-HB-10001', 1, 'hub', gen_random_uuid()::text,
  'Intel NUC', 'Linux', '2.0', false,
- '{"hub":{"in_use":true},"network_type":"ethernet"}'::jsonb);
+ '{
+   "hub": {"inUse": true},
+   "networkType": "ethernet",
+   "batteryLevel": 100.0,
+   "batteryState": "plugged"
+}'::jsonb),
 
--- ===========================
---  Devices for other org/venue (1 each)
--- ===========================
-INSERT INTO device (
-    doc_id, org_id, venue_id, app_version, name, prefix_code, serial_number,
-    type, uuid, hardware, os_name, os_version, doc
-)
-VALUES
-('dev-org2', 'test-org-2', 'test-venue-2', 'v1.0.0', 'Printer 2', 'P2', 'SN-P2', 'printer', gen_random_uuid()::text, 'Epson TM-T82', 'Linux', '1.0',
- '{"printer":{"model":"Epson TM-T82"},"network_type":"ethernet"}'::jsonb),
-('dev-org3', 'test-org-3', 'test-venue-3', 'v1.0.0', 'Kiosk 3', 'K3', 'SN-K3', 'kiosk', gen_random_uuid()::text, 'KioskGo', 'Android', '11',
- '{"kiosk":{"can_show_receipt_qr":false},"network_type":"wifi"}'::jsonb),
-('dev-org4', 'test-org-4', 'test-venue-4', 'v1.0.0', 'Cash Drawer 4', 'CD4', 'SN-CD4', 'cashdro', gen_random_uuid()::text, 'CashDro Lite', 'Linux', '1.0',
- '{"cashdro":{"protocol":"tcp"},"network_type":"ethernet"}'::jsonb),
-('dev-org5', 'test-org-5', 'test-venue-5', 'v1.0.0', 'Kitchen Display 5', 'KD5', 'SN-KD5', 'kitchen', gen_random_uuid()::text, 'LG Monitor', 'Android', '9',
- '{"kitchen":{"is_chef":false},"network_type":"wifi"}'::jsonb),
-('dev-org11', 'test-org-11', 'test-venue-11', 'v1.0.0', 'Hub Controller 11', 'HB11', 'SN-HB11', 'hub', gen_random_uuid()::text, 'Intel NUC Mini', 'Linux', '2.1',
- '{"hub":{"in_use":false},"network_type":"ethernet"}'::jsonb);
+-- ============ Other orgs (1 each) ============
+('dev-org2', 'test-org-2', 'test-venue-2', 'v1.0.0', false, false,
+ 'PRN002', true, false, false, 'Printer 2', 'P2', 'SN-P2', 1, 'printer', gen_random_uuid()::text,
+ 'Epson TM-T82', 'Linux', '1.0', false,
+ '{"printer":{"model":"Epson TM-T82","ipAddress":"192.168.2.2"},"networkType":"ethernet","batteryLevel":100.0,"batteryState":"plugged"}'::jsonb),
+('dev-org3', 'test-org-3', 'test-venue-3', 'v1.0.0', false, false,
+ 'KSK003', true, false, false, 'Kiosk 3', 'K3', 'SN-K3', 1, 'kiosk', gen_random_uuid()::text,
+ 'KioskGo', 'Android', '11', false,
+ '{"kiosk":{"canShowReceiptQr":false,"color":"white"},"networkType":"wifi","batteryLevel":85.0,"batteryState":"normal"}'::jsonb),
+('dev-org4', 'test-org-4', 'test-venue-4', 'v1.0.0', false, false,
+ 'CD004', true, false, false, 'Cash Drawer 4', 'CD4', 'SN-CD4', 1, 'cashdro', gen_random_uuid()::text,
+ 'CashDro Lite', 'Linux', '1.0', false,
+ '{"cashdro":{"protocol":"tcp","ipAddress":"192.168.4.1"},"networkType":"ethernet","batteryLevel":100.0,"batteryState":"plugged"}'::jsonb),
+('dev-org5', 'test-org-5', 'test-venue-5', 'v1.0.0', false, false,
+ 'KD005', true, false, false, 'Kitchen Display 5', 'KD5', 'SN-KD5', 1, 'kitchen', gen_random_uuid()::text,
+ 'LG Monitor', 'Android', '9', false,
+ '{"kitchen":{"isChef":false,"alwaysOpen":true},"networkType":"wifi","batteryLevel":90.0,"batteryState":"normal"}'::jsonb),
+('dev-org11', 'test-org-11', 'test-venue-11', 'v1.0.0', false, false,
+ 'HUB011', true, false, false, 'Hub Controller 11', 'HB11', 'SN-HB11', 1, 'hub', gen_random_uuid()::text,
+ 'Intel NUC Mini', 'Linux', '2.1', false,
+ '{"hub":{"inUse":false},"networkType":"ethernet","batteryLevel":100.0,"batteryState":"plugged"}'::jsonb);
