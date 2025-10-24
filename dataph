@@ -1,0 +1,123 @@
+INSERT INTO payment_history (
+    doc_id, org_id, venue_id, booking_cost, code, created_by, delivery_cost,
+    device_id, email, error, giftcard_usage_id, has_sync_error, is_completed,
+    is_final, is_ignored, is_invoice_pending, is_paid, is_partial, is_synced,
+    method, no_covered, order_id, pay_nl_ticket, reservation_id, rounding_off,
+    sales_location, shift_id, status, terminal_id, tip, title, total,
+    transaction_id, type, user_tags, uuid, wallet_type, doc
+)
+VALUES
+-- ✅ 10 payments for test-org-1 across venues
+('pay-001', 'test-org-1', 'test-venue-1', 1250.50, 'TXN1001', 'manager@org1.com', 50.0,
+ 'POS-101', 'customer1@mail.com', '', 'GFT1001', false, true,
+ true, false, false, true, false, true,
+ 'Card', 2, 'ORD1001', 'PNL1001', 'RSV1001', 0.50,
+ 'Front Desk', 'SHIFT-1', 'Completed', 'TERM-1', 25.00, 'Dinner Payment', 1326.00,
+ 'TRX1001', 'Dine-In', ARRAY['VIP', 'Loyal'], 'UUID-1001', 'WalletX',
+ '{
+    "actions": ["checkout", "print_receipt"],
+    "bank_id": "HDFC001",
+    "change": 0.0,
+    "coins_rounding_off": 0.5,
+    "customer_reference": "CUST-A1",
+    "discount": 24.0,
+    "extra1": "Late night discount",
+    "gift_cards": [
+        {
+            "giftcard_id": "GFT1001",
+            "ledger": "GiftLedger",
+            "price": 100.0,
+            "type": "Voucher",
+            "title": "Birthday Offer",
+            "user_tag": "Promo"
+        }
+    ],
+    "has_subscription": false,
+    "hook_status": "ok",
+    "invoice_finalized_on": null,
+    "is_black_box": false,
+    "items": [
+        { "discount": 10.0, "ledger": "Food", "total": 1200.0, "user_tag": "Dinner", "vat": 50.0 }
+    ],
+    "needs_signature": false,
+    "no_coins": 0.0,
+    "payment_url": "https://pay.org1.com/ORD1001",
+    "printer_id": "PRN-11",
+    "products": [
+        {
+            "categories": [{"id": "CAT1", "title": "Food"}],
+            "discount": 10.0,
+            "ledger": "Restaurant",
+            "product_id": "FOOD001",
+            "quantity": 2,
+            "type": "Meal",
+            "title": "Paneer Butter Masala",
+            "total_cost": 600.0,
+            "total": 1200.0,
+            "user_tag": "Dinner",
+            "vat": 50.0
+        }
+    ],
+    "source": "POS",
+    "split_info": null,
+    "timezone": 19800,
+    "trans_type": "Full",
+    "web_access_key": "WEB-001",
+    "platform": "Android",
+    "has_gift_cards": true
+ }'::jsonb
+),
+
+-- ✅ 1 payment for test-org-2
+('pay-011', 'test-org-2', 'test-venue-2', 890.00, 'TXN2001', 'staff@org2.com', 25.0,
+ 'POS-202', 'user2@mail.com', '', 'GFT2001', false, true,
+ true, false, false, true, false, true,
+ 'UPI', 3, 'ORD2001', 'PNL2001', 'RSV2001', 0.0,
+ 'Main Counter', 'SHIFT-2', 'Completed', 'TERM-2', 10.00, 'Lunch Payment', 925.00,
+ 'TRX2001', 'Takeaway', ARRAY['Regular'], 'UUID-2001', 'WalletY',
+ '{
+    "actions": ["checkout"],
+    "bank_id": "SBI002",
+    "change": 0.0,
+    "coins_rounding_off": 0.0,
+    "customer_reference": "CUST-B1",
+    "discount": 15.0,
+    "extra1": "Festival Offer",
+    "gift_cards": [],
+    "has_subscription": false,
+    "hook_status": "ok",
+    "invoice_finalized_on": null,
+    "is_black_box": false,
+    "items": [
+        { "discount": 15.0, "ledger": "Food", "total": 900.0, "user_tag": "Lunch", "vat": 10.0 }
+    ],
+    "needs_signature": false,
+    "no_coins": 0.0,
+    "payment_url": "https://pay.org2.com/ORD2001",
+    "printer_id": "PRN-22",
+    "products": [
+        {
+            "categories": [{"id": "CAT2", "title": "Food"}],
+            "discount": 15.0,
+            "ledger": "Restaurant",
+            "product_id": "FOOD002",
+            "quantity": 1,
+            "type": "Meal",
+            "title": "Veg Thali",
+            "total_cost": 900.0,
+            "total": 900.0,
+            "user_tag": "Lunch",
+            "vat": 10.0
+        }
+    ],
+    "source": "POS",
+    "split_info": null,
+    "timezone": 19800,
+    "trans_type": "Full",
+    "web_access_key": "WEB-002",
+    "platform": "iOS",
+    "has_gift_cards": false
+ }'::jsonb
+);
+
+-- Repeat similar rows for org-3, org-4, org-5, and org-11 with distinct details.
