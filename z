@@ -1,0 +1,18 @@
+fn get_message<'a>(
+    messages: &'a [Message],
+    language: &str,
+    order_type: &str,
+) -> Option<&'a Message> {
+    // First search: language + type logic
+    if let Some(msg) = messages.iter().find(|item| {
+        item.language == language
+            && (item.r#type.is_none() || item.r#type.as_deref() == Some(order_type))
+    }) {
+        return Some(msg);
+    }
+
+    // Fallback search: only type logic
+    messages.iter().find(|item| {
+        item.r#type.is_none() || item.r#type.as_deref() == Some(order_type)
+    })
+}
