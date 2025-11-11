@@ -1,0 +1,153 @@
+Perfect — below is a production-ready template you can drop into your project to make all error responses common, clean, and reusable across all handlers.
+
+
+---
+
+✅ 1. common_responses.rs (new file)
+
+use utoipa::ToResponse;
+use crate::models::RestCommonResponse;
+
+/// 401 Unauthorized (Invalid token, expired, missing, mismatched org, etc.)
+#[derive(ToResponse)]
+#[response(
+    description = "Access denied",
+    example = json!({"success": false, "error": "Invalid or expired token"})
+)]
+pub struct UnauthorizedResponse(RestCommonResponse);
+
+/// 500 Internal Server Error
+#[derive(ToResponse)]
+#[response(
+    description = "Unexpected error",
+    example = json!({"success": false, "error": "Unexpected server error"})
+)]
+pub struct InternalServerErrorResponse(RestCommonResponse);
+
+✅ Single location
+✅ Example included
+✅ Uses your shape (RestCommonResponse)
+
+
+---
+
+✅ 2. Register them in OpenApi
+
+#[derive(OpenApi)]
+#[openapi(
+    paths(
+        // ...
+    ),
+    components(
+        schemas(RestCommonResponse),
+        responses(
+            UnauthorizedResponse,
+            InternalServerErrorResponse
+        )
+    )
+)]
+pub struct ApiDoc;
+
+
+---
+
+✅ 3. Use them anywhere
+
+#[utoipa::path(
+    get,
+    path = "/auth",
+    summary = "Issue access & refresh tokens",
+    responses(
+        (status = 200, body = RestDataResponse<AuthTokenResponse>),
+        (ref = "UnauthorizedResponse"),
+        (ref = "InternalServerErrorResponse")
+    ),
+    security(
+        ("AUTHORIZATION" = [])
+    )
+)]
+pub async fn get_auth_token() {}
+
+No duplication, consistent everywhere.
+
+
+---
+
+✅ 4. (Optional) Helper macro for even less typing
+
+Create:
+
+macro_rules! common_errors {
+    () => {
+        (ref = "UnauthorizedResponse"),
+        (ref = "InternalServerErrorResponse")
+    };
+}
+
+pub(crate) use common_errors;
+
+Then:
+
+#[utoipa::path(
+    get,
+    path = "/category/grid",
+    responses(
+        (status = 200, body = RestDataResponse<CategoryGridResponse>),
+        common_errors!()
+    )
+)]
+
+Done ✅
+
+
+---
+
+✅ 5. Bonus improvement (recommended)
+
+Add one more reusable response for:
+
+403 Forbidden (permissions)
+
+400 Bad Request (validation)
+
+
+Example:
+
+#[derive(ToResponse)]
+#[response(
+    description = "Invalid input",
+    example = json!({"success": false, "error": "Missing required fields"})
+)]
+pub struct BadRequestResponse(RestCommonResponse);
+
+You’ll use it a lot.
+
+
+---
+
+🎯 Result
+
+This gives you:
+
+Centralized error response documentation
+
+Cleaner handlers
+
+Auto-updated examples
+
+No duplication across 50+ endpoints
+
+Perfectly consistent Swagger UI
+
+
+
+---
+
+If you want, I can also generate:
+
+✅ 403 Forbidden
+✅ 404 Not Found
+✅ 408 Request Timeout
+✅ 429 Too Many Requests
+
+Just tell me.
