@@ -380,3 +380,161 @@ crates/infra-db/
 └── src/
     └── lib.rs           # DBManager, Config, and Deadpool implementation
 
+
+
+
+// Libs - DB - Manager
+
+use anyhow::Result;
+use config::Config;
+use deadpool_postgres::{Manager, ManagerConfig, Pool, RecyclingMethod};
+use serde::Deserialize;
+use std::str::FromStr;
+use thiserror::Error;
+use tracing::{debug, error, info};
+
+// Re-export useful types for downstream usage
+pub use tokio_postgres::{Row, types::ToSql};
+
+// --- TYPE ALIASES ---
+
+/// Alias for the Database Connection Pool
+pub type DBPool = Pool;
+
+/// Alias for a raw Database Connection (Client)
+/// Deadpool wraps the tokio_postgres::Client
+pub type DB = deadpool_postgres::Client;
+
+// --- ERROR HANDLING ---
+
+/// Unified Error type for database operations.
+#[derive(Debug, Error)]
+pub enum DbError {
+    /// Error acquiring a connection from the pool.
+    #[error("Failed to get connection from pool: {0}")]
+    PoolError(#[from] deadpool_postgres::PoolError),
+
+    /// Database driver error (SQL syntax, connection loss, etc.).
+    #[error("Database driver error: {0}")]
+    PostgresError(#[from] tokio_postgres::Error),
+
+    /// Configuration or setup error.
+    #[error("Configuration error: {0}")]
+    ConfigError(#[from] anyhow::Error),
+
+    /// Other I/O error.
+    #[error(transparent)]
+    Other(#[from] std::io::Error),
+}
+
+// --- CONFIGURATION ---
+
+/// Database configuration loaded from environment variables.
+#[derive(Debug, Deserialize, Clone)]
+pub struct DBConfig {
+    pub url: String,
+    pub pool_max_size: usize,
+}
+
+impl DBConfig {
+    /// Loads database configuration from environment variables using default prefix "DB".
+    pub fn new() -> Result<DBConfig> {
+        Self::create("DB")
+    }
+
+    /// Loads configuration with a custom prefix (e.g., "AUTH_DB").
+    pub fn new_with_prefix(prefix: &str) -> Result<DBConfig> {
+        Self::create(prefix)
+    }
+
+    fn create(prefix: &str) -> Result<DBConfig> {
+        info!("Loading DBConfig from environment variables with prefix: {}", prefix);
+        let config = Config::builder()
+            .add_source(
+                config::Environment::with_prefix(prefix)
+                    .try_parsing(true)
+                    .prefix_separator("_"),
+            )
+            .build()?;
+        let db_cfg: Self = config.try_deserialize()?;
+        debug!("Loaded DBConfig");
+        Ok(db_cfg)
+    }
+}
+
+// --- MANAGER STRUCT ---
+
+/// Manages the database connection pool.
+#[derive(Clone, Debug)]
+pub struct DBManager {
+    pool: DBPool,
+}
+
+// --- TLS CONFIGURATION ---
+
+/// Returns NoTls for development/testing (default).
+#[cfg(not(feature = "tls"))]
+pub fn get_tls() -> tokio_postgres::NoTls {
+    tokio_postgres::NoTls
+}
+
+/// Returns Rustls connector for production/staging.
+/// Expects "rds.pem" to be present in the root directory.
+#[cfg(feature = "tls")]
+pub fn get_tls() -> tokio_postgres_rustls::MakeRustlsConnect {
+    let cert_file = std::fs::File::open("rds.pem").expect("Failed to open rds.pem");
+    let mut buf = std::io::BufReader::new(cert_file);
+    let mut root_store = rustls::RootCertStore::empty();
+    
+    for cert in rustls_pemfile::certs(&mut buf) {
+        match cert {
+            Ok(c) => root_store.add(c).unwrap(),
+            Err(e) => error!("Bad certificate in rds.pem: {}", e),
+        }
+    }
+
+    let tls_config = rustls::ClientConfig::builder()
+        .with_root_certificates(root_store)
+        .with_no_client_auth();
+        
+    tokio_postgres_rustls::MakeRustlsConnect::new(tls_config)
+}
+
+// --- IMPLEMENTATION ---
+
+impl DBManager {
+    /// Initializes a new database manager with connection pooling using Deadpool.
+    pub async fn new(config: &DBConfig) -> Result<Self, DbError> {
+        info!("Initializing DBManager with Deadpool");
+
+        // 1. Parse the URL into tokio_postgres::Config
+        let pg_config = tokio_postgres::Config::from_str(&config.url)
+            .map_err(|e| anyhow::anyhow!("Invalid DB URL: {}", e))?;
+
+        // 2. Configure the Deadpool Manager
+        // RecyclingMethod::Fast ensures high performance by clearing statements/transactions 
+        // rather than fully closing connections.
+        let mgr_config = ManagerConfig {
+            recycling_method: RecyclingMethod::Fast,
+        };
+        
+        let mgr = Manager::from_config(pg_config, get_tls(), mgr_config);
+
+        // 3. Build the Pool
+        let pool = Pool::builder(mgr)
+            .max_size(config.pool_max_size)
+            // Optional: Add timeouts if needed
+            // .wait_timeout(Some(Duration::from_secs(10))) 
+            .build()
+            .map_err(|e| anyhow::anyhow!("Failed to create pool: {}", e))?;
+
+        debug!("DBManager: Deadpool connection pool created");
+        Ok(Self { pool })
+    }
+
+    /// Retrieves a pooled database connection.
+    /// The caller gets a `deadpool_postgres::Client` which implements Deref to `tokio_postgres::Client`.
+    pub async fn get_conn(&self) -> Result<DB, DbError> {
+        self.pool.get().await.map_err(DbError::PoolError)
+    }
+}
