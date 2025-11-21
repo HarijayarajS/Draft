@@ -274,3 +274,109 @@ impl DBManager {
 }
 
 ```
+
+
+
+# Specification: Shared Library (`crates/`)
+
+**Library Name**: `infra-db`
+**Category**: Infrastructure / Data Persistence
+
+## 1. Overview and Scope
+
+  * **Crate Name**: `db` (Directory: `infra-db`)
+  * **Problem Statement**:
+      * Centralizes PostgreSQL database connection management to avoid code duplication across microservices.
+      * Manages efficient connection pooling using `deadpool-postgres`.
+      * Abstracts configuration loading from environment variables.
+      * Handles secure connection upgrades (TLS) for production environments (e.g., AWS RDS) versus plain TCP for local development.
+  * **Architectural Pattern**:
+      * The `DBManager` acts as a Singleton wrapper around the `deadpool_postgres::Pool`, providing a simplified interface for acquiring connections (`Client`).
+
+## 2. Feature Strategy & Conditional Compilation
+
+| Feature Flag | Description                                                                 | Primary Dependency                 |
+| :----------- | :-------------------------------------------------------------------------- | :--------------------------------- |
+| `default`    | Standard PostgreSQL connection using `NoTls`.                               | `deadpool-postgres`, `tokio-postgres` |
+| `tls`        | Enables TLS support using `rustls` (specifically for RDS/Cloud SQL).        | `tokio-postgres-rustls`, `rustls`, `rustls-pemfile` |
+
+## 3. Configuration Specifications
+
+### 3.1 Configuration & State
+
+The configuration is deserialized from environment variables using the `config` crate.
+
+  * **Struct Name**: `DBConfig`
+  * **Fields**:
+      * `url`: `String` - The full Postgres connection string (e.g., `postgres://user:pass@localhost:5432/db`).
+      * `pool_max_size`: `usize` - The maximum number of connections allowed in the pool.
+
+### 3.2 Environment Variables
+
+The library relies on environment variables with a configurable prefix (Default: `DB_`).
+
+| Variable Name       | Requirement  | Description                                                  |
+| :------------------ | :----------- | :----------------------------------------------------------- |
+| `DB_URL`            | **Required** | The connection string.                                       |
+| `DB_POOL_MAX_SIZE`  | Optional     | Defaults to pool defaults (usually cpu_count * 4) if not set.|
+| `rds.pem` (File)    | Conditional  | Required in the root directory if `tls` feature is enabled.  |
+
+## 4. Public Interface Design
+
+### 4.1 Main Database Interface (`lib.rs`)
+
+  * **Primary Struct**: `pub struct DBManager { pool: DBPool }`
+
+  * **Type Definitions (Aliases)**:
+      * `pub type DBPool = deadpool_postgres::Pool;`
+      * `pub type DBConnection = deadpool_postgres::Client;`
+      * `pub type DbError = anyhow::Error;` (or a custom `thiserror` enum wrapping Deadpool errors)
+
+  * **Methods**:
+
+      * `pub fn new_with_prefix(prefix: &str) -> Result<DBConfig>`
+          * *Description*: Loads configuration from env vars starting with `prefix` (e.g., `AUTH_DB_URL` if prefix is "AUTH_DB").
+      * `pub async fn new(config: &DBConfig) -> Result<DBManager>`
+          * *Description*: Initializes the `deadpool` Manager, configures TLS (if feature enabled), and builds the Pool.
+      * `pub async fn get_conn(&self) -> Result<DBConnection>`
+          * *Description*: Retrieves a `Client` from the pool. Handles `PoolError` internally and maps to application error.
+
+### 4.2 TLS Configuration (Internal Helper)
+
+  * **Functions**:
+      * `fn get_tls() -> TlsConnector`
+          * *Behavior (Default)*: Returns `tokio_postgres::NoTls`.
+          * *Behavior (TLS)*: Loads `rds.pem`, creates a `rustls::RootCertStore`, and returns a `MakeRustlsConnect` configuration.
+
+## 5. Error Handling Strategy
+
+  * **Approach**:
+      * Utilizes `thiserror` to define a custom `DbError` enum that wraps upstream errors.
+  * **Common Errors**:
+      * `deadpool_postgres::PoolError`: Pool is closed or timeout occurred while waiting for a slot.
+      * `tokio_postgres::Error`: SQL syntax errors or connection interruptions.
+      * `ConfigError`: Missing or malformed environment variables.
+
+## 6. Dependencies
+
+  * **Core**: `anyhow`, `tokio`, `tracing`, `serde`, `serde_json`.
+  * **Database**: 
+      * `deadpool-postgres` (Pooling)
+      * `tokio-postgres` (Driver)
+  * **Configuration**: `config`.
+  * **Security (Feature: `tls`)**: `rustls`, `tokio-postgres-rustls`, `rustls-pemfile`.
+
+## 7. Testing Strategy
+  * **Configuration Test**: Set arbitrary env vars and verify `DBConfig::new()` parses them correctly.
+  * **Connection Test**: Spin up a Docker PostgreSQL container, connect via `DBManager`, and execute `SELECT 1`.
+  * **Pool Exhaustion Test**: specific to Deadpool, verify that requesting `pool_max_size + 1` connections waits or times out correctly.
+  * **TLS Fallback**: Ensure `tls` feature compilation does not break when running locally without certificates (if configured to fallback or fail fast).
+
+## 8. Directory Structure Blueprint
+
+```text
+crates/infra-db/
+├── Cargo.toml           # Features: [default, tls]
+└── src/
+    └── lib.rs           # DBManager, Config, and Deadpool implementation
+
