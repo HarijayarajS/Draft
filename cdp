@@ -1,0 +1,7 @@
+Grid Pagination
+Showing 1 to 20 of 30 results
+Displays the current range of rows shown and the total number of available records.
+< 1 2 >
+Pagination controls to move between previous, current, and next pages.
+Rows per page: 20
+Sets how many rows are displayed per page and updates pagination accordingly.
