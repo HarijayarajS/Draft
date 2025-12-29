@@ -1,0 +1,18 @@
+impl CategoryItem {
+    pub fn recalculate_no_products(items: &mut Vec<Self>) {
+        for item in items.iter_mut() {
+            item.recalculate();
+        }
+    }
+
+    fn recalculate(&mut self) -> usize {
+        let mut total = 0;
+
+        for child in self.sub_categories.iter_mut() {
+            total += child.recalculate();
+        }
+
+        self.no_products = total;
+        total
+    }
+}
