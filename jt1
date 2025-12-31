@@ -1,0 +1,31 @@
+BEGIN;
+
+-- 1️⃣ Remove products from all other categories
+UPDATE category
+SET
+    product_ids = (
+        SELECT array_agg(p)
+        FROM unnest(product_ids) p
+        WHERE NOT (p = ANY($1))
+    ),
+    no_products = COALESCE(
+        array_length(
+            (
+                SELECT array_agg(p)
+                FROM unnest(product_ids) p
+                WHERE NOT (p = ANY($1))
+            ), 1
+        ),
+        0
+    )
+WHERE doc_id <> $2
+  AND product_ids && $1;
+
+-- 2️⃣ Update the target category
+UPDATE category
+SET
+    product_ids = $1,
+    no_products = COALESCE(array_length($1, 1), 0)
+WHERE doc_id = $2;
+
+COMMIT;
