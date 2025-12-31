@@ -1,0 +1,7 @@
+UPDATE your_table
+SET your_array_column = (
+    SELECT array_agg(elem)
+    FROM unnest(your_array_column) AS elem
+    WHERE NOT (elem = ANY($1))
+)
+WHERE your_array_column && $1;
