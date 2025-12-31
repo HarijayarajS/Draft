@@ -1,0 +1,18 @@
+BEGIN;
+
+-- remove from other categories
+UPDATE category
+SET product_ids = (
+    SELECT array_agg(p)
+    FROM unnest(product_ids) p
+    WHERE NOT (p = ANY($1))
+)
+WHERE doc_id <> $2
+  AND product_ids && $1;
+
+-- add to target category
+UPDATE category
+SET product_ids = $1
+WHERE doc_id = $2;
+
+COMMIT;
