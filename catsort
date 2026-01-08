@@ -1,0 +1,9 @@
+fn sort_by_first_category(items: &mut Vec<Item>, asc: bool) {
+    if asc {
+        items.sort_by_key(|item| item.category.first().cloned().unwrap_or_default());
+    } else {
+        items.sort_by_key(|item| std::cmp::Reverse(
+            item.category.first().cloned().unwrap_or_default()
+        ));
+    }
+}
