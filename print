@@ -1,0 +1,8 @@
+UPDATE your_table
+SET
+    printer_ids = array_remove(printer_ids, :printer_id),
+    is_deleted = CASE
+        WHEN printer_ids = ARRAY[:printer_id] THEN true
+        ELSE is_deleted
+    END
+WHERE printer_ids @> ARRAY[:printer_id];
