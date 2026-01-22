@@ -1,0 +1,240 @@
+use anyhow::{Context, Result};
+use clap::Parser;
+use colored::*;
+use std::{collections::HashMap, process::Command};
+
+#[derive(Parser, Debug)]
+#[command(name = "db-migration-guard")]
+#[command(about = "Detects schema changes and validates migrations")]
+struct Args {
+    /// Base branch to compare against
+    #[arg(default_value = "origin/main")]
+    base: String,
+}
+
+fn main() -> Result<()> {
+    let args = Args::parse();
+
+    let diff = git_diff(&args.base)?;
+    let files = git_changed_files(&args.base)?;
+
+    let report = analyze(&diff, &files);
+
+    print_report(&report);
+
+    if report.has_error {
+        std::process::exit(1);
+    }
+
+    Ok(())
+}
+
+/* ==================== Git ==================== */
+
+fn git_changed_files(base: &str) -> Result<Vec<String>> {
+    let output = Command::new("git")
+        .args(["diff", "--name-only", &format!("{base}...HEAD")])
+        .output()
+        .context("Failed to run git diff --name-only")?;
+
+    Ok(String::from_utf8_lossy(&output.stdout)
+        .lines()
+        .map(|s| s.to_string())
+        .collect())
+}
+
+fn git_diff(base: &str) -> Result<String> {
+    let output = Command::new("git")
+        .args(["diff", &format!("{base}...HEAD")])
+        .output()
+        .context("Failed to run git diff")?;
+
+    Ok(String::from_utf8_lossy(&output.stdout).to_string())
+}
+
+/* ==================== Analysis ==================== */
+
+#[derive(Default)]
+struct DdlUsage {
+    create_table: bool,
+    alter_table: bool,
+    drop_table: bool,
+    create_trigger: bool,
+    drop_trigger: bool,
+    create_function: bool,
+}
+
+impl DdlUsage {
+    fn merge(&mut self, other: DdlUsage) {
+        self.create_table |= other.create_table;
+        self.alter_table |= other.alter_table;
+        self.drop_table |= other.drop_table;
+        self.create_trigger |= other.create_trigger;
+        self.drop_trigger |= other.drop_trigger;
+        self.create_function |= other.create_function;
+    }
+
+    fn missing_from(&self, migration: &DdlUsage) -> Vec<&'static str> {
+        let mut missing = Vec::new();
+
+        if self.create_table && !migration.create_table {
+            missing.push("CREATE TABLE");
+        }
+        if self.alter_table && !migration.alter_table {
+            missing.push("ALTER TABLE");
+        }
+        if self.drop_table && !migration.drop_table {
+            missing.push("DROP TABLE");
+        }
+        if self.create_trigger && !migration.create_trigger {
+            missing.push("CREATE TRIGGER");
+        }
+        if self.drop_trigger && !migration.drop_trigger {
+            missing.push("DROP TRIGGER");
+        }
+        if self.create_function && !migration.create_function {
+            missing.push("CREATE FUNCTION");
+        }
+
+        missing
+    }
+}
+
+struct Report {
+    schema_files: Vec<String>,
+    migration_files: Vec<String>,
+    schema_ddl: DdlUsage,
+    migration_ddl: DdlUsage,
+    missing_ddls: Vec<&'static str>,
+    has_error: bool,
+}
+
+fn analyze(diff: &str, files: &[String]) -> Report {
+    let schema_files: Vec<_> = files.iter().filter(|f| is_schema_file(f)).cloned().collect();
+    let migration_files: Vec<_> = files.iter().filter(|f| is_migration_file(f)).cloned().collect();
+
+    let diff_by_file = split_diff_by_file(diff);
+
+    let mut schema_ddl = DdlUsage::default();
+    let mut migration_ddl = DdlUsage::default();
+
+    for (file, content) in diff_by_file {
+        let ddl = detect_ddl(&content);
+
+        if is_schema_file(&file) {
+            schema_ddl.merge(ddl);
+        }
+
+        if is_migration_file(&file) {
+            migration_ddl.merge(ddl);
+        }
+    }
+
+    let missing_ddls = schema_ddl.missing_from(&migration_ddl);
+    let has_error = !schema_files.is_empty()
+        && (migration_files.is_empty() || !missing_ddls.is_empty());
+
+    Report {
+        schema_files,
+        migration_files,
+        schema_ddl,
+        migration_ddl,
+        missing_ddls,
+        has_error,
+    }
+}
+
+/* ==================== Rules ==================== */
+
+fn is_schema_file(path: &str) -> bool {
+    path.ends_with(".sql")
+        && (path.contains("/tables/")
+            || path.contains("/triggers/")
+            || path.contains("/functions/"))
+}
+
+fn is_migration_file(path: &str) -> bool {
+    path.ends_with(".sql") && path.contains("/updates/") && path.contains("v_")
+}
+
+/* ==================== DDL Detection ==================== */
+
+fn detect_ddl(sql: &str) -> DdlUsage {
+    let sql = sql.to_uppercase();
+
+    DdlUsage {
+        create_table: sql.contains("CREATE TABLE"),
+        alter_table: sql.contains("ALTER TABLE"),
+        drop_table: sql.contains("DROP TABLE"),
+        create_trigger: sql.contains("CREATE TRIGGER"),
+        drop_trigger: sql.contains("DROP TRIGGER"),
+        create_function: sql.contains("CREATE FUNCTION"),
+    }
+}
+
+/* ==================== Diff Parsing ==================== */
+
+fn split_diff_by_file(diff: &str) -> HashMap<String, String> {
+    let mut map = HashMap::new();
+    let mut current_file: Option<String> = None;
+
+    for line in diff.lines() {
+        if line.starts_with("diff --git") {
+            current_file = line.split(" b/").nth(1).map(|s| s.to_string());
+            continue;
+        }
+
+        if let Some(file) = &current_file {
+            map.entry(file.clone())
+                .or_insert_with(String::new)
+                .push_str(line);
+        }
+    }
+
+    map
+}
+
+/* ==================== Output ==================== */
+
+fn print_report(r: &Report) {
+    println!("\n{}", "DB MIGRATION GUARD REPORT".bold());
+    println!("{}", "==========================");
+
+    if !r.schema_files.is_empty() {
+        println!("\n{}", "Schema files changed:".yellow());
+        for f in &r.schema_files {
+            println!("  - {}", f);
+        }
+    }
+
+    if r.migration_files.is_empty() {
+        println!("\n{}", "Migration files: ❌ NONE".red());
+    } else {
+        println!("\n{}", "Migration files found:".green());
+        for f in &r.migration_files {
+            println!("  - {}", f);
+        }
+    }
+
+    if !r.missing_ddls.is_empty() {
+        println!("\n{}", "Missing migration operations:".red());
+        for ddl in &r.missing_ddls {
+            println!("  - {}", ddl);
+        }
+    }
+
+    if r.has_error {
+        println!(
+            "\n{}\n{}",
+            "❌ ERROR".red().bold(),
+            "Schema changes are not fully reflected in migration files".red()
+        );
+        println!(
+            "{}",
+            "➜ Add the missing DDL statements to db/updates/v_XXX__description.sql"
+                .yellow()
+        );
+    } else {
+        println!("\n{}", "✅ CHECK PASSED".green().bold());
+    }
+}
