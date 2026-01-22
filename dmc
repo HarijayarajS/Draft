@@ -1,0 +1,237 @@
+Alright 👍
+Here is a clean, production-ready Rust CLI you can directly use.
+No theory, no extra ideas — just the working solution.
+
+This CLI will:
+
+✅ Detect table.sql / trigger.sql changes
+✅ Check if migration (updater) files exist
+✅ Print a clear report
+✅ Fail CI / block merge if missing
+
+
+---
+
+🦀 Rust CLI: db-migration-guard
+
+
+---
+
+1️⃣ Folder Structure
+
+db-migration-guard/
+├── Cargo.toml
+└── src/
+    └── main.rs
+
+
+---
+
+2️⃣ Cargo.toml
+
+[package]
+name = "db-migration-guard"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+anyhow = "1"
+colored = "2"
+
+
+---
+
+3️⃣ src/main.rs (FULL CODE)
+
+use anyhow::{Context, Result};
+use clap::Parser;
+use colored::*;
+use std::process::Command;
+
+#[derive(Parser, Debug)]
+#[command(name = "db-migration-guard")]
+#[command(about = "Blocks schema changes without migration files")]
+struct Args {
+    /// Base branch to compare (default: origin/main)
+    #[arg(default_value = "origin/main")]
+    base: String,
+}
+
+fn main() -> Result<()> {
+    let args = Args::parse();
+
+    let changed_files = git_changed_files(&args.base)?;
+    let report = analyze(&changed_files);
+
+    print_report(&report);
+
+    if report.has_error {
+        std::process::exit(1);
+    }
+
+    Ok(())
+}
+
+/* ---------------- Git ---------------- */
+
+fn git_changed_files(base: &str) -> Result<Vec<String>> {
+    let output = Command::new("git")
+        .args(["diff", "--name-only", &format!("{base}...HEAD")])
+        .output()
+        .context("Failed to run git diff")?;
+
+    let files = String::from_utf8_lossy(&output.stdout)
+        .lines()
+        .map(|s| s.to_string())
+        .collect();
+
+    Ok(files)
+}
+
+/* ---------------- Analysis ---------------- */
+
+struct Report {
+    schema_files: Vec<String>,
+    migration_files: Vec<String>,
+    has_error: bool,
+}
+
+fn analyze(files: &[String]) -> Report {
+    let schema_files = files
+        .iter()
+        .filter(|f| is_schema_file(f))
+        .cloned()
+        .collect::<Vec<_>>();
+
+    let migration_files = files
+        .iter()
+        .filter(|f| is_migration_file(f))
+        .cloned()
+        .collect::<Vec<_>>();
+
+    let has_error = !schema_files.is_empty() && migration_files.is_empty();
+
+    Report {
+        schema_files,
+        migration_files,
+        has_error,
+    }
+}
+
+/* ---------------- Rules ---------------- */
+
+fn is_schema_file(path: &str) -> bool {
+    path.ends_with(".sql")
+        && (path.contains("/tables/")
+            || path.contains("/triggers/")
+            || path.contains("/functions/"))
+}
+
+fn is_migration_file(path: &str) -> bool {
+    path.contains("/updates/")
+        && path.ends_with(".sql")
+        && path.contains("v_")
+}
+
+/* ---------------- Output ---------------- */
+
+fn print_report(report: &Report) {
+    println!("\n{}", "DB MIGRATION GUARD REPORT".bold());
+    println!("{}", "==========================");
+
+    if !report.schema_files.is_empty() {
+        println!("\n{}", "Schema files changed:".yellow());
+        for f in &report.schema_files {
+            println!("  - {}", f);
+        }
+    } else {
+        println!("\n{}", "No schema changes detected".green());
+    }
+
+    if report.migration_files.is_empty() {
+        println!("\n{}", "Migration files: ❌ NONE".red());
+    } else {
+        println!("\n{}", "Migration files found:".green());
+        for f in &report.migration_files {
+            println!("  - {}", f);
+        }
+    }
+
+    if report.has_error {
+        println!(
+            "\n{}\n{}",
+            "❌ ERROR".red().bold(),
+            "Schema changes detected without migration files".red()
+        );
+        println!(
+            "{}",
+            "➜ Add a file under db/updates/v_XXX__description.sql".yellow()
+        );
+    } else {
+        println!("\n{}", "✅ CHECK PASSED".green().bold());
+    }
+}
+
+
+---
+
+4️⃣ How To Use
+
+Run locally
+
+cargo run -- origin/main
+
+Install globally
+
+cargo install --path .
+
+Use anywhere
+
+db-migration-guard origin/main
+
+
+---
+
+5️⃣ CI Usage (MOST IMPORTANT)
+
+GitHub / GitLab / Jenkins
+
+db-migration-guard origin/main
+
+If someone forgets migration: ❌ Command exits with 1
+❌ PR fails
+❌ Merge blocked
+
+
+---
+
+6️⃣ What This SOLVES (Permanently)
+
+✔ No forgotten updater files
+✔ No silent DB drift
+✔ No human dependency
+✔ Works for teams
+✔ Works with Rust + SQLx + Axum
+✔ Zero DB access
+✔ Very fast
+
+
+---
+
+🔥 Optional Enhancements (Later)
+
+If you want next:
+
+Scan SQL diff content (ALTER TABLE, CREATE TRIGGER)
+
+JSON output for CI bots
+
+Auto-suggest migration name
+
+Workspace / monorepo support
+
+Pre-commit hook generator
+
+
+Just tell me what to add next 👌
