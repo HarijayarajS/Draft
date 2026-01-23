@@ -1,0 +1,304 @@
+use anyhow::{Context, Result};
+use clap::Parser;
+use colored::*;
+use std::{
+    collections::{HashMap, HashSet},
+    process::Command,
+};
+
+#[derive(Parser)]
+struct Args {
+    #[arg(default_value = "origin/main")]
+    base: String,
+}
+
+fn main() -> Result<()> {
+    let args = Args::parse();
+
+    let diff = git_diff(&args.base)?;
+    let files = git_changed_files(&args.base)?;
+
+    let report = analyze(&diff, &files);
+
+    print_report(&report);
+
+    if report.has_error {
+        std::process::exit(1);
+    }
+
+    Ok(())
+}
+
+/* ================= Git ================= */
+
+fn git_diff(base: &str) -> Result<String> {
+    let out = Command::new("git")
+        .args(["diff", &format!("{base}...HEAD")])
+        .output()
+        .context("git diff failed")?;
+    Ok(String::from_utf8_lossy(&out.stdout).to_string())
+}
+
+fn git_changed_files(base: &str) -> Result<Vec<String>> {
+    let out = Command::new("git")
+        .args(["diff", "--name-only", &format!("{base}...HEAD")])
+        .output()
+        .context("git diff --name-only failed")?;
+
+    Ok(String::from_utf8_lossy(&out.stdout)
+        .lines()
+        .map(|s| s.to_string())
+        .collect())
+}
+
+/* ================= Models ================= */
+
+#[derive(Default, Debug)]
+struct ColumnDiff {
+    added: Vec<String>,
+    removed: Vec<String>,
+    modified: Vec<String>,
+}
+
+#[derive(Default)]
+struct TableReport {
+    table: String,
+    column_diff: ColumnDiff,
+    alter_count: usize,
+}
+
+struct Report {
+    tables: Vec<TableReport>,
+    migration_tables: HashSet<String>,
+    warnings: Vec<String>,
+    has_error: bool,
+}
+
+/* ================= Analysis ================= */
+
+fn analyze(diff: &str, files: &[String]) -> Report {
+    let diff_by_file = split_diff_by_file(diff);
+
+    let mut table_reports = HashMap::<String, TableReport>::new();
+    let mut migration_sql = String::new();
+
+    for (file, content) in &diff_by_file {
+        if is_schema_file(file) {
+            let table = extract_table_name(file);
+            let col_diff = detect_column_diff(content);
+
+            table_reports
+                .entry(table.clone())
+                .or_insert(TableReport {
+                    table,
+                    ..Default::default()
+                })
+                .column_diff = col_diff;
+        }
+
+        if is_migration_file(file) {
+            migration_sql.push_str(content);
+        }
+    }
+
+    let migration_alters = count_alter_table(&migration_sql);
+    let migration_tables = extract_tables_from_migration(&migration_sql);
+
+    let mut warnings = Vec::new();
+    let mut has_error = false;
+
+    for table in table_reports.values_mut() {
+        let required = table.column_diff.added.len()
+            + table.column_diff.removed.len()
+            + table.column_diff.modified.len();
+
+        table.alter_count = migration_alters;
+
+        if required > 0 && migration_alters < required {
+            has_error = true;
+        }
+    }
+
+    let schema_tables: HashSet<_> = table_reports.keys().cloned().collect();
+    let unrelated: Vec<_> = migration_tables
+        .difference(&schema_tables)
+        .cloned()
+        .collect();
+
+    if !unrelated.is_empty() {
+        warnings.push(format!(
+            "Migration touches unrelated tables: {:?}",
+            unrelated
+        ));
+    }
+
+    Report {
+        tables: table_reports.into_values().collect(),
+        migration_tables,
+        warnings,
+        has_error,
+    }
+}
+
+/* ================= Schema Parsing ================= */
+
+fn detect_column_diff(diff: &str) -> ColumnDiff {
+    let mut added = Vec::new();
+    let mut removed = Vec::new();
+
+    for line in diff.lines() {
+        let l = line.trim();
+
+        if l.starts_with('+') && is_column_def(l) {
+            added.push(clean_column(l));
+        } else if l.starts_with('-') && is_column_def(l) {
+            removed.push(clean_column(l));
+        }
+    }
+
+    let added_names: Vec<_> = added.iter().map(column_name).collect();
+    let removed_names: Vec<_> = removed.iter().map(column_name).collect();
+
+    let modified = added_names
+        .iter()
+        .filter(|n| removed_names.contains(n))
+        .cloned()
+        .collect();
+
+    ColumnDiff {
+        added,
+        removed,
+        modified,
+    }
+}
+
+fn is_column_def(line: &str) -> bool {
+    let l = line.trim_start_matches(['+', '-']);
+    l.contains(' ')
+        && !l.starts_with("CONSTRAINT")
+        && !l.starts_with("PRIMARY")
+}
+
+fn clean_column(line: &str) -> String {
+    line.trim_start_matches(['+', '-'])
+        .trim()
+        .trim_end_matches(',')
+        .to_string()
+}
+
+fn column_name(col: &String) -> String {
+    col.split_whitespace().next().unwrap().to_string()
+}
+
+/* ================= Migration Parsing ================= */
+
+fn count_alter_table(sql: &str) -> usize {
+    sql.to_uppercase().matches("ALTER TABLE").count()
+}
+
+fn extract_tables_from_migration(sql: &str) -> HashSet<String> {
+    let mut tables = HashSet::new();
+
+    for line in sql.lines() {
+        let u = line.to_uppercase();
+        if let Some(idx) = u.find("ALTER TABLE") {
+            let rest = &line[idx + 11..];
+            if let Some(name) = rest.split_whitespace().next() {
+                tables.insert(name.to_string());
+            }
+        }
+    }
+
+    tables
+}
+
+/* ================= Diff Utils ================= */
+
+fn split_diff_by_file(diff: &str) -> HashMap<String, String> {
+    let mut map = HashMap::new();
+    let mut current: Option<String> = None;
+
+    for line in diff.lines() {
+        if line.starts_with("diff --git") {
+            current = line.split(" b/").nth(1).map(|s| s.to_string());
+            continue;
+        }
+
+        if let Some(file) = &current {
+            map.entry(file.clone())
+                .or_insert_with(String::new)
+                .push_str(line);
+        }
+    }
+
+    map
+}
+
+/* ================= Rules ================= */
+
+fn is_schema_file(path: &str) -> bool {
+    path.ends_with(".sql") && path.contains("/tables/")
+}
+
+fn is_migration_file(path: &str) -> bool {
+    path.ends_with(".sql") && path.contains("/updates/") && path.contains("v_")
+}
+
+fn extract_table_name(path: &str) -> String {
+    path.split('/')
+        .last()
+        .unwrap()
+        .replace(".sql", "")
+}
+
+/* ================= Output ================= */
+
+fn print_report(report: &Report) {
+    println!("\n{}", "DB MIGRATION GUARD REPORT".bold());
+    println!("{}", "==========================");
+
+    for table in &report.tables {
+        println!("\nTable: {}", table.table.cyan());
+
+        for c in &table.column_diff.added {
+            println!("  + {}", c.green());
+        }
+        for c in &table.column_diff.removed {
+            println!("  - {}", c.red());
+        }
+        for c in &table.column_diff.modified {
+            println!("  ~ {}", c.yellow());
+        }
+
+        println!(
+            "  ALTER TABLE count in migration: {}",
+            table.alter_count
+        );
+
+        if table.alter_count < table.column_diff.added.len()
+            + table.column_diff.removed.len()
+            + table.column_diff.modified.len()
+        {
+            println!("{}", "  ❌ Not enough ALTER TABLE statements".red());
+        }
+    }
+
+    for w in &report.warnings {
+        println!("\n{} {}", "⚠ WARNING:".yellow(), w);
+    }
+
+    if report.has_error {
+        println!(
+            "\n{}\n{}",
+            "❌ ERROR".red().bold(),
+            "Schema changes are not fully reflected in migration files".red()
+        );
+        println!(
+            "{}",
+            "➜ Suggested migration template will be generated next"
+                .yellow()
+        );
+    } else {
+        println!("\n{}", "✅ CHECK PASSED".green().bold());
+    }
+}
